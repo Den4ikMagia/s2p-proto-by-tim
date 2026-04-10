@@ -31,6 +31,15 @@ jobs:
         env:
           # Подпапка сайта: https://<user>.github.io/<repo>/
           VITE_BASE: /${{ github.event.repository.name }}/
+      # Иначе в Settings → Pages часто остаётся «Deploy from branch» и отдаётся сырой index.html с /src/main.jsx → белый экран.
+      - name: Verify bundle (not dev index.html)
+        run: |
+          test -s dist/index.html
+          grep -qE 'assets/index-.*\.js|/assets/index-.*\.js' dist/index.html || {
+            echo "::error::dist/index.html must reference built /assets/*.js — check Vite build and Pages source (use GitHub Actions, not branch / root)."
+            cat dist/index.html
+            exit 1
+          }
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
