@@ -1,0 +1,77 @@
+.ad-offer-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: max(16px, calc(env(safe-area-inset-bottom) + 88px));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.ad-offer-bar > .ad-offer-bar__btn {
+  pointer-events: auto;
+}
+
+.ad-offer-bar__btn {
+  border: none;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  font-family: inherit;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ad-offer-bar__btn:active:not(:disabled) {
+  transform: scale(0.98);
+  opacity: 0.92;
+}
+
+.ad-offer-bar__btn--no-ads {
+  justify-self: start;
+  padding: 10px 14px;
+  color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+}
+
+.ad-offer-bar__btn--claim {
+  justify-self: center;
+  grid-column: 2;
+  padding: 17px 42px;
+  min-height: 52px;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  color: #0a0a0a;
+  background: #33ff00;
+  box-shadow: 0 4px 28px rgba(51, 255, 0, 0.45);
+}
+
+.ad-offer-bar__btn--skip {
+  justify-self: end;
+  grid-column: 3;
+  min-width: 76px;
+  padding: 10px 14px;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  font-variant-numeric: tabular-nums;
+}
+
+.ad-offer-bar__btn--skip:disabled {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.ad-offer-bar__btn--skip:not(:disabled) {
+  font-size: 22px;
+  line-height: 1;
+  padding: 8px 14px;
+}

@@ -1,0 +1,163 @@
+.offer-popup {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  pointer-events: auto;
+}
+
+.offer-popup__backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+
+.offer-popup__card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 340px;
+  padding: 24px 20px 20px;
+  border-radius: 20px;
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  animation: offer-popup-in 0.25s ease;
+}
+
+@keyframes offer-popup-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.offer-popup__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.offer-popup__label {
+  display: inline-block;
+  margin: 0 0 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.offer-popup__label--sponsored {
+  color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.offer-popup__label--bonus {
+  color: #1a1400;
+  background: linear-gradient(90deg, #ffe566, #ffcc00);
+  border: 1px solid rgba(255, 200, 0, 0.5);
+}
+
+.offer-popup__label--free-reward {
+  color: #e0fff7;
+  background: rgba(0, 200, 170, 0.25);
+  border: 1px solid rgba(0, 255, 200, 0.35);
+}
+
+.offer-popup__card--energy {
+  border-color: rgba(0, 195, 255, 0.45);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 195, 255, 0.15) inset;
+}
+
+.offer-popup__card--betting {
+  border-color: rgba(255, 200, 80, 0.45);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 180, 0, 0.08);
+}
+
+.offer-popup__card--welcome {
+  border-color: rgba(180, 120, 255, 0.5);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 0 40px rgba(140, 80, 255, 0.12);
+}
+
+.offer-popup__card--energy .offer-popup__cta {
+  background: linear-gradient(135deg, #00b4ff, #0070d9);
+}
+
+.offer-popup__card--betting .offer-popup__cta {
+  background: linear-gradient(135deg, #ffb020, #e67800);
+}
+
+.offer-popup__card--welcome .offer-popup__cta {
+  background: linear-gradient(135deg, #a855f7, #6d28d9);
+}
+
+.offer-popup__trigger {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fe2c55;
+}
+
+.offer-popup__title {
+  margin: 0 0 10px;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #fff;
+  padding-right: 32px;
+}
+
+.offer-popup__desc {
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.offer-popup__cta {
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #fff;
+  background: linear-gradient(135deg, #fe2c55, #c41e42);
+  cursor: pointer;
+}
+
+.offer-popup__cta:active {
+  opacity: 0.92;
+}

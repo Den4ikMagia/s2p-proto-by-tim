@@ -1,0 +1,690 @@
+:root {
+  --bg: #000;
+  --text: #fff;
+  --text-dim: rgba(255, 255, 255, 0.55);
+  --pill-bg: rgba(0, 0, 0, 0.45);
+  --accent: #fe2c55;
+  --accent-soft: rgba(254, 44, 85, 0.25);
+  --energy-blue-top: #00c3fd;
+  --energy-blue-bot: #007ad9;
+  --energy-blue-inner: #006bc0;
+  --extra-pink-top: #ff2c68;
+  --extra-pink-bot: #a31f6e;
+  --coin-gold: #ffe537;
+  --rail-green: #a6ff00;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --figma-w: 375px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.app {
+  position: relative;
+  height: 100%;
+  max-width: min(100%, var(--figma-w));
+  margin: 0 auto;
+}
+
+.feed {
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.feed::-webkit-scrollbar {
+  display: none;
+}
+
+.slide {
+  position: relative;
+  height: 100dvh;
+  min-height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  flex-shrink: 0;
+  background: #0a0a0a;
+}
+
+.slide__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #111;
+}
+
+/* Figma: Rectangle 31 (opacity 0.8) + Rectangle 32 снизу */
+.slide__shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.8) 10.31%, rgba(0, 0, 0, 0) 100%);
+  background-size:
+    100% clamp(100px, 18vh, 121px),
+    100% clamp(180px, 29vh, 237px);
+  background-position: top center, bottom center;
+  background-repeat: no-repeat;
+}
+
+.slide-rail {
+  position: absolute;
+  left: max(16px, env(safe-area-inset-left));
+  top: 50%;
+  transform: translateY(-38%);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.slide-rail__booster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.slide-rail__coin-x {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.slide-rail__coin {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #fff 0%, transparent 42%),
+    radial-gradient(circle at 30% 30%, #ffe537 0%, #fecc13 45%, #f29605 100%);
+  box-shadow: inset 0 -2px 4px rgba(242, 150, 5, 0.6);
+}
+
+.slide-rail__mult-val {
+  margin-top: 2px;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 11px;
+  text-transform: uppercase;
+  color: #000;
+  border: 1px solid #fff;
+  padding: 0 2px;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* Figma Frame 123: вертикальная капсула booster */
+.slide-rail__track {
+  width: 22px;
+  height: 167px;
+  padding: 2px;
+  border-radius: 100px;
+  background: rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+}
+
+.slide-rail__track-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border-radius: 100px;
+  overflow: hidden;
+  padding: 2px;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.slide-rail__seg {
+  flex: 1 1 0;
+  min-height: 0;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.slide-rail__seg--fill {
+  background: rgba(166, 255, 0, 0.4);
+}
+
+.hud {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  pointer-events: none;
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+}
+
+.hud--top {
+  top: 0;
+  padding-top: calc(8px + var(--safe-top));
+}
+
+.hud--bottom {
+  bottom: 0;
+  padding: 0 max(24px, env(safe-area-inset-left)) calc(16px + var(--safe-bottom))
+    max(24px, env(safe-area-inset-right));
+}
+
+.top-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.top-bar__center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.energy-stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.icon-btn {
+  box-sizing: border-box;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 40px;
+  background: rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon-btn:active {
+  transform: scale(0.96);
+}
+
+.icon-btn__lines {
+  display: block;
+  width: 16px;
+  height: 2px;
+  background: #fff;
+  border-radius: 1px;
+  box-shadow: 0 -5px 0 #fff, 0 5px 0 #fff;
+}
+
+/* Figma Energy Bar 112×32 */
+.energy-pill {
+  box-sizing: border-box;
+  width: 112px;
+  height: 32px;
+  padding: 3px;
+  border-radius: 40px;
+  background: transparent;
+}
+
+.energy-pill__inner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  padding: 0 4px;
+  border-radius: 100px;
+  background: linear-gradient(180deg, var(--energy-blue-top) 47.22%, var(--energy-blue-bot) 100%);
+  box-shadow: 0 0 6.1px rgba(0, 157, 255, 0.6), inset 0 -4px 6.7px var(--energy-blue-inner);
+}
+
+.energy-pill__text {
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 16px;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+
+.energy-pill__bolt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.energy-pill__bolt-svg {
+  display: block;
+  filter: drop-shadow(0 0 1px rgba(0, 66, 189, 0.8));
+}
+
+.extra-pill {
+  margin-top: -4px;
+  padding: 1px 10px 2px;
+  border-radius: 20px;
+  border: 1px solid rgba(154, 0, 87, 0.6);
+  background: linear-gradient(180deg, var(--extra-pink-top) 0%, var(--extra-pink-bot) 100%);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 13px;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.extra-pill[hidden] {
+  display: none !important;
+}
+
+/* Figma Coins bar */
+.balance-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+  max-width: 46%;
+  height: 32px;
+  padding: 4px 18px 4px 4px;
+  border-radius: 40px;
+  background: linear-gradient(
+      90deg,
+      rgba(255, 202, 2, 0.5) 9.65%,
+      rgba(255, 202, 2, 0.15) 47.18%,
+      rgba(255, 202, 2, 0.1) 87.15%
+    ),
+    rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+
+.balance-pill__coin {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.45) 0%, transparent 42%),
+    radial-gradient(circle at 30% 30%, #ffe537 0%, #fecc13 50%, #f29605 100%);
+  box-shadow: inset 0 -1px 2px rgba(242, 150, 5, 0.5);
+}
+
+.balance-pill__value {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 16px;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.balance-pill__plus {
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 1px solid #28c900;
+  border-radius: 50%;
+  background: #33ff00;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.balance-pill__plus-icon {
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1;
+  color: #356b00;
+}
+
+.balance-pill__plus:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.dock {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.player-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  width: 100%;
+  max-width: 327px;
+}
+
+.btn-player {
+  position: relative;
+  box-sizing: border-box;
+  flex: 1;
+  max-width: 157.5px;
+  min-height: 66px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.btn-player--left {
+  padding: 17px 8px 17px 30px;
+}
+
+.btn-player--right {
+  padding: 17px 30px 17px 8px;
+}
+
+.btn-player:active {
+  transform: scale(0.98);
+}
+
+.btn-player:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-player__avatar-wrap {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 46px;
+  height: 46px;
+  padding: 4px;
+  border-radius: 23px;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-player--left .btn-player__avatar-wrap {
+  left: -16px;
+}
+
+.btn-player--right .btn-player__avatar-wrap {
+  right: -17px;
+}
+
+.btn-player__avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  box-sizing: border-box;
+}
+
+.btn-player__avatar--a {
+  background: linear-gradient(145deg, #6a8ab8 0%, #3d5a80 100%);
+}
+
+.btn-player__avatar--b {
+  background: linear-gradient(145deg, #c47a68 0%, #7a4a3d 100%);
+}
+
+.btn-player__name {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  text-transform: uppercase;
+  text-align: center;
+  max-width: 120px;
+}
+
+.dock .game-buttons:not([hidden]) {
+  width: 100%;
+  max-width: 327px;
+}
+
+.game-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.game-buttons[hidden] {
+  display: none !important;
+}
+
+.btn-game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 88px;
+  max-width: 120px;
+  flex: 1 1 88px;
+  padding: 10px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.btn-game:active {
+  transform: scale(0.97);
+}
+
+.btn-game__img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.btn-game:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.feed-error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  text-align: center;
+  color: var(--text-dim);
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.feed-error__btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #fff;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+.feed-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.feed-loading[hidden] {
+  display: none !important;
+}
+
+.modal[hidden] {
+  display: none !important;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 24px;
+  padding-bottom: max(24px, var(--safe-bottom));
+}
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+}
+
+.modal__card {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  padding: 24px;
+  border-radius: 20px;
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  animation: slideUp 0.28s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal__title {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.modal__text {
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-dim);
+}
+
+.modal__offer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(254, 44, 85, 0.12);
+  border: 1px solid rgba(254, 44, 85, 0.25);
+}
+
+.modal__price {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.modal__bonus {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ff6b8a;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #fff;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+.btn-primary:active {
+  opacity: 0.92;
+}
+
+.btn-ghost {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text-dim);
+  background: transparent;
+  cursor: pointer;
+}

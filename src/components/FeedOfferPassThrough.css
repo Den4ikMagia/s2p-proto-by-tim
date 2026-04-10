@@ -1,0 +1,214 @@
+.feed-offer-pass {
+  position: relative;
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: max(20px, env(safe-area-inset-top)) 18px
+    max(100px, calc(env(safe-area-inset-bottom) + 88px));
+  background: #050508;
+  color: #fff;
+}
+
+.feed-offer-pass__center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+}
+
+.feed-offer-pass__brand-slot {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+}
+
+.feed-offer-pass__brand-img {
+  display: block;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  max-height: min(120px, 22vh);
+  object-fit: contain;
+  object-position: center;
+}
+
+.feed-offer-pass__brand {
+  position: relative;
+  text-align: center;
+  padding: 12px 0 8px;
+}
+
+.feed-offer-pass__brand--fallback {
+  width: 100%;
+}
+
+.feed-offer-pass__orbit {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 220px;
+  height: 72px;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(234, 179, 8, 0.55);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.feed-offer-pass__star {
+  position: absolute;
+  color: #facc15;
+  font-size: 14px;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(250, 204, 21, 0.5);
+}
+
+.feed-offer-pass__star--1 {
+  left: 18%;
+  top: -4px;
+}
+
+.feed-offer-pass__star--2 {
+  left: 44%;
+  top: -14px;
+  font-size: 18px;
+}
+
+.feed-offer-pass__star--3 {
+  right: 16%;
+  top: 2px;
+}
+
+.feed-offer-pass__logo {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: clamp(26px, 7vw, 32px);
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  font-style: italic;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.feed-offer-pass__rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.feed-offer-pass__rating-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #a855f7, #6b21a8);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.feed-offer-pass__rating-text strong {
+  color: #fff;
+  font-weight: 800;
+}
+
+.feed-offer-pass__card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+  padding: 18px 16px;
+  border: 2px dashed rgba(168, 85, 247, 0.85);
+  border-radius: 12px;
+  background: rgba(20, 10, 35, 0.6);
+  box-sizing: border-box;
+}
+
+.feed-offer-pass__gift {
+  flex-shrink: 0;
+}
+
+.feed-offer-pass__card-text {
+  text-align: left;
+  min-width: 0;
+}
+
+.feed-offer-pass__card-label {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.feed-offer-pass__card-headline {
+  margin: 0;
+  font-size: clamp(17px, 4.8vw, 21px);
+  font-weight: 800;
+  line-height: 1.25;
+  color: #fff;
+}
+
+.feed-offer-pass__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+  padding-top: 8px;
+}
+
+.feed-offer-pass__no-ads {
+  align-self: flex-start;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 11px;
+  font-weight: 800;
+  font-family: inherit;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.feed-offer-pass__no-ads:active {
+  opacity: 0.9;
+  transform: scale(0.99);
+}
+
+.feed-offer-pass__play {
+  width: 100%;
+  padding: 18px 24px;
+  min-height: 58px;
+  border: none;
+  border-radius: 14px;
+  background: #33ff00;
+  color: #0a0a0a;
+  font-size: 18px;
+  font-weight: 900;
+  font-family: inherit;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 6px 32px rgba(51, 255, 0, 0.35);
+}
+
+.feed-offer-pass__play:active {
+  transform: scale(0.99);
+  opacity: 0.95;
+}

@@ -1,0 +1,56 @@
+.video-feed {
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.video-feed::-webkit-scrollbar {
+  display: none;
+}
+
+.video-feed--locked {
+  overscroll-behavior: none;
+  touch-action: pan-x;
+}
+
+/* Один snap на строку ленты (обёртка), иначе smooth + вложенный snap дают «полуэкран» */
+.video-feed__slide,
+.video-feed__item {
+  position: relative;
+  height: 100dvh;
+  min-height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  flex-shrink: 0;
+}
+
+.video-feed__slide {
+  background: #0a0a0a;
+}
+
+.video-feed__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #111;
+}
+
+.video-feed__shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.8) 10.31%, rgba(0, 0, 0, 0) 100%);
+  background-size:
+    100% clamp(100px, 18vh, 121px),
+    100% clamp(180px, 29vh, 237px);
+  background-position: top center, bottom center;
+  background-repeat: no-repeat;
+}
