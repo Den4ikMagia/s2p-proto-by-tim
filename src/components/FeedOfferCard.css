@@ -20,16 +20,8 @@
   align-items: stretch;
 }
 
-.feed-offer--energy:not(.feed-offer--pass-through) {
-  background: linear-gradient(165deg, #061a22 0%, #0a1018 45%, #081820 100%);
-}
-
-.feed-offer--betting {
+.feed-offer:not(.feed-offer--pass-through) {
   background: linear-gradient(165deg, #221a08 0%, #12100a 45%, #181208 100%);
-}
-
-.feed-offer--welcome {
-  background: linear-gradient(165deg, #1a1028 0%, #0e0a14 50%, #120818 100%);
 }
 
 .feed-offer__body {

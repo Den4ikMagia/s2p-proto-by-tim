@@ -15,10 +15,9 @@ function formatHms(totalSeconds) {
 
 const BOOST_ICON_SRC = publicUrl("energy-paywall-boost-icon.png");
 
-export function EnergyPaywallModal() {
+/** Полноэкранный контент paywall внутри ленты (без закрытия, без fixed). */
+export function EnergyPaywallFeedPanel() {
   const {
-    energyPaywallOpen,
-    closeEnergyPaywall,
     claimPartnerCasinoEnergy,
     purchaseEnergyPack100,
     openShopEnergyTab,
@@ -27,45 +26,22 @@ export function EnergyPaywallModal() {
   const [secondsLeft, setSecondsLeft] = useState(FREE_ENERGY_SECONDS);
 
   useEffect(() => {
-    if (!energyPaywallOpen) return;
     setSecondsLeft(FREE_ENERGY_SECONDS);
-  }, [energyPaywallOpen]);
+  }, []);
 
   useEffect(() => {
-    if (!energyPaywallOpen) return;
     const t = setInterval(() => {
       setSecondsLeft((prev) => (prev <= 0 ? 0 : prev - 1));
     }, 1000);
     return () => clearInterval(t);
-  }, [energyPaywallOpen]);
-
-  useEffect(() => {
-    if (!energyPaywallOpen) return;
-    const prev = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = "hidden";
-    return () => {
-      document.documentElement.style.overflow = prev;
-    };
-  }, [energyPaywallOpen]);
-
-  if (!energyPaywallOpen) return null;
+  }, []);
 
   return (
     <div
-      className="energy-paywall"
-      role="dialog"
-      aria-modal="true"
+      className="energy-paywall energy-paywall--feed"
+      role="region"
       aria-labelledby="energy-paywall-title"
     >
-      <button
-        type="button"
-        className="energy-paywall__close"
-        aria-label="Закрыть"
-        onClick={closeEnergyPaywall}
-      >
-        ×
-      </button>
-
       <header className="energy-paywall__lead">
         <h1 id="energy-paywall-title" className="energy-paywall__lead-title">
           Энергия закончилась 😢

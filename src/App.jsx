@@ -1,13 +1,15 @@
 import { useCallback, useMemo, useState } from "react";
 import { OffersProvider, useOffers } from "./context/OffersContext";
-import { EnergyPaywallModal } from "./components/EnergyPaywallModal";
-import { OfferPopup } from "./components/OfferPopup";
 import { ShopModal } from "./components/ShopModal";
 import { CoinWinFlyover } from "./components/CoinWinFlyover";
 import { LoseFeedbackOverlay } from "./components/LoseFeedbackOverlay";
 import { DailyBonusModal } from "./components/DailyBonusModal";
 import { VideoFeed } from "./components/VideoFeed";
-import { PROTOTYPE_VIDEOS, buildFeedItems } from "./constants/videos";
+import {
+  PROTOTYPE_VIDEOS,
+  buildFeedItems,
+  injectEnergyPaywallAfterVideo,
+} from "./constants/videos";
 import { publicUrl } from "./publicUrl";
 import "./App.css";
 
@@ -32,15 +34,26 @@ function AppShell() {
     clearCoinWinFx,
     loseFxRunId,
     clearLoseFx,
+    energyPaywallInsertAfterVideoId,
   } = useOffers();
 
-  const items = useMemo(
+  const baseFeedItems = useMemo(
     () => buildFeedItems(expandVideos(20)),
     []
   );
 
+  const items = useMemo(
+    () =>
+      injectEnergyPaywallAfterVideo(
+        baseFeedItems,
+        energyPaywallInsertAfterVideoId
+      ),
+    [baseFeedItems, energyPaywallInsertAfterVideoId]
+  );
+
   const isSponsoredVideoActive = Boolean(
-    activeFeedItemKey?.startsWith("sponsored_video:")
+    activeFeedItemKey?.startsWith("sponsored_video:") ||
+      activeFeedItemKey?.startsWith("energy_paywall:")
   );
 
   const [coinBalancePulse, setCoinBalancePulse] = useState(false);
@@ -114,9 +127,7 @@ function AppShell() {
       ) : null}
 
       <DailyBonusModal />
-      <EnergyPaywallModal />
       <ShopModal />
-      <OfferPopup />
     </div>
   );
 }

@@ -71,3 +71,23 @@ export function buildFeedItems(videos) {
   }
   return items;
 }
+
+/**
+ * Вставляет полноэкранный слайд paywall энергии сразу после указанного видео.
+ * @param {Array<{ type: string, id: string, src?: string }>} items
+ * @param {string | null | undefined} afterVideoId — id элемента type "video"
+ */
+export function injectEnergyPaywallAfterVideo(items, afterVideoId) {
+  if (afterVideoId == null || afterVideoId === "") return items;
+  const slideId = `energy-paywall-after-${afterVideoId}`;
+  if (items.some((it) => it.type === "energy_paywall" && it.id === slideId)) {
+    return items;
+  }
+  const idx = items.findIndex(
+    (it) => it.type === "video" && it.id === afterVideoId
+  );
+  if (idx === -1) return items;
+  const out = items.slice();
+  out.splice(idx + 1, 0, { type: "energy_paywall", id: slideId });
+  return out;
+}

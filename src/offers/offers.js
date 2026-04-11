@@ -1,9 +1,9 @@
 /**
- * @typedef {"energy_paywall" | "onboarding" | "feed_ad"} OfferTrigger
+ * @typedef {"feed_ad"} OfferTrigger
  */
 
 /**
- * @typedef {"energy" | "betting" | "welcome"} OfferKind
+ * @typedef {"betting"} OfferKind
  */
 
 /**
@@ -32,32 +32,6 @@
 /** Плейсхолдер; замените на реальный URL партнёра */
 export const FEED_AD_PARTNER_URL_DEFAULT =
   "https://example.com/partner?utm_source=in_feed";
-
-/** @type {Offer} */
-const OFFER_ENERGY_PAYWALL = {
-  id: "energy-paywall-50",
-  kind: "energy",
-  uiLabel: "Free reward",
-  title: "Получи 50 энергии бесплатно",
-  description:
-    "Закончилась энергия? Возьми пакет и продолжай смотреть ленту и делать ставки.",
-  cta: "Забрать энергию",
-  rewardType: "energy",
-  rewardValue: 50,
-};
-
-/** @type {Offer} */
-const OFFER_WELCOME = {
-  id: "welcome-new-players",
-  kind: "welcome",
-  uiLabel: "Free reward",
-  title: "Бонус новым игрокам",
-  description:
-    "Добро пожаловать! Стартовый пакет монет для первых ставок в ленте.",
-  cta: "Активировать бонус",
-  rewardType: "coins",
-  rewardValue: 200,
-};
 
 /**
  * Библиотека пропускных плейсментов (изображение + welcome-текст, без таймера).
@@ -159,10 +133,6 @@ export function getFeedOfferForSlot(feedSlotIndex) {
  */
 export function getOfferByTrigger(triggerType, feedSlotIndex = 0) {
   switch (triggerType) {
-    case "energy_paywall":
-      return OFFER_ENERGY_PAYWALL;
-    case "onboarding":
-      return OFFER_WELCOME;
     case "feed_ad":
       return getFeedOfferForSlot(feedSlotIndex);
     default:

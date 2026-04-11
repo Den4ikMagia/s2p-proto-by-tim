@@ -32,6 +32,12 @@
   background: #0a0a0a;
 }
 
+.video-feed__item--energy-paywall {
+  display: flex;
+  flex-direction: column;
+  background: #0d0618;
+}
+
 .video-feed__media {
   position: absolute;
   inset: 0;

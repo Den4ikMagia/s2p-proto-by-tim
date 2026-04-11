@@ -4,15 +4,12 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import { primeSfxFromUserGesture, preloadSfxBases } from "../audio/sfx";
 import { vibrateBetWin } from "../haptics";
-import { getOfferByTrigger } from "../offers/offers";
 
 /** @typedef {import("../offers/offers").Offer} Offer */
-/** @typedef {import("../offers/offers").OfferTrigger} OfferTrigger */
 
 const OffersContext = createContext(null);
 
@@ -34,14 +31,11 @@ function isDailyBonusClaimed() {
 export function OffersProvider({ children }) {
   const [energy, setEnergy] = useState(3);
   const [coins, setCoins] = useState(0);
-  const [energyPaywallOpen, setEnergyPaywallOpen] = useState(false);
+  /** После ставки на этом video id энергия стала 0 — следующий слайд в ленте = paywall */
+  const [energyPaywallInsertAfterVideoId, setEnergyPaywallInsertAfterVideoId] =
+    useState(/** @type {string | null} */ (null));
   const [shopOpen, setShopOpen] = useState(false);
   const [shopTab, setShopTab] = useState(/** @type {'coins' | 'energy'} */ ("coins"));
-  const [showOffer, setShowOffer] = useState(false);
-  /** @type {[Offer | null, React.Dispatch<React.SetStateAction<Offer | null>>]} */
-  const [currentOffer, setCurrentOffer] = useState(null);
-  /** @type {[OfferTrigger | null, React.Dispatch<React.SetStateAction<OfferTrigger | null>>]} */
-  const [popupTriggerType, setPopupTriggerType] = useState(null);
   /** @type {[string | null, React.Dispatch<React.SetStateAction<string | null>>]} */
   const [activeFeedItemKey, setActiveFeedItemKey] = useState(null);
   /** @type {[null | { amount: number, runId: number }, React.Dispatch<React.SetStateAction<null | { amount: number, runId: number }>>]} */
@@ -49,10 +43,6 @@ export function OffersProvider({ children }) {
   /** @type {[number | null, React.Dispatch<React.SetStateAction<number | null>>]} */
   const [loseFxRunId, setLoseFxRunId] = useState(/** @type {number | null} */ (null));
   const [dailyBonusOpen, setDailyBonusOpen] = useState(false);
-
-  const onboardingDoneRef = useRef(false);
-  const lastSwipeKeyRef = useRef(null);
-  const swipeCountRef = useRef(0);
 
   const applyOfferReward = useCallback((offer) => {
     if (!offer) return;
@@ -63,52 +53,17 @@ export function OffersProvider({ children }) {
     }
   }, []);
 
-  const openOffer = useCallback((offer, triggerType) => {
-    setCurrentOffer(offer);
-    setPopupTriggerType(triggerType);
-    setShowOffer(true);
+  const scheduleEnergyPaywallAfterVideo = useCallback((videoId) => {
+    if (videoId == null || videoId === "") return;
+    setEnergyPaywallInsertAfterVideoId(videoId);
   }, []);
-
-  const openOfferByTrigger = useCallback((triggerType) => {
-    const offer = getOfferByTrigger(triggerType);
-    openOffer(offer, triggerType);
-  }, [openOffer]);
-
-  const closeOffer = useCallback(() => {
-    setShowOffer(false);
-    setCurrentOffer(null);
-    setPopupTriggerType(null);
-  }, []);
-
-  const claimOffer = useCallback(() => {
-    setCurrentOffer((prev) => {
-      if (prev) applyOfferReward(prev);
-      return null;
-    });
-    setShowOffer(false);
-    setPopupTriggerType(null);
-  }, [applyOfferReward]);
-
-  const openEnergyPaywall = useCallback(() => {
-    setEnergyPaywallOpen(true);
-  }, []);
-
-  const closeEnergyPaywall = useCallback(() => {
-    setEnergyPaywallOpen(false);
-  }, []);
-
-  const tryEnergyPaywall = useCallback(() => {
-    openEnergyPaywall();
-  }, [openEnergyPaywall]);
 
   const claimPartnerCasinoEnergy = useCallback(() => {
     setEnergy((e) => e + 35);
-    setEnergyPaywallOpen(false);
   }, []);
 
   const purchaseEnergyPack100 = useCallback(() => {
     setEnergy((e) => e + 100);
-    setEnergyPaywallOpen(false);
   }, []);
 
   const openShop = useCallback((tab = "coins") => {
@@ -119,15 +74,16 @@ export function OffersProvider({ children }) {
   const closeShop = useCallback(() => setShopOpen(false), []);
 
   const openShopEnergyTab = useCallback(() => {
-    setEnergyPaywallOpen(false);
     setShopTab("energy");
     setShopOpen(true);
   }, []);
 
-  /**
-   * Считает смену центрального элемента ленты как свайп.
-   * После 5 свайпов — onboarding-оффер (один раз).
-   */
+  useEffect(() => {
+    if (energy > 0) {
+      setEnergyPaywallInsertAfterVideoId(null);
+    }
+  }, [energy]);
+
   const playCoinWinAnimation = useCallback((amount) => {
     const n = Math.max(0, Math.round(Number(amount)));
     setCoinWinFx({ amount: n, runId: Date.now() });
@@ -172,31 +128,14 @@ export function OffersProvider({ children }) {
 
   const clearLoseFx = useCallback(() => setLoseFxRunId(null), []);
 
-  const onActiveFeedItemChange = useCallback(
-    (key) => {
-      if (key == null || key === "") return;
-      if (key.startsWith("sponsored_video:")) return;
-      if (lastSwipeKeyRef.current === key) return;
-      lastSwipeKeyRef.current = key;
-      swipeCountRef.current += 1;
-      if (onboardingDoneRef.current) return;
-      if (swipeCountRef.current >= 5) {
-        onboardingDoneRef.current = true;
-        openOfferByTrigger("onboarding");
-      }
-    },
-    [openOfferByTrigger]
-  );
-
   const value = useMemo(
     () => ({
       energy,
       setEnergy,
       coins,
       setCoins,
-      energyPaywallOpen,
-      openEnergyPaywall,
-      closeEnergyPaywall,
+      energyPaywallInsertAfterVideoId,
+      scheduleEnergyPaywallAfterVideo,
       claimPartnerCasinoEnergy,
       purchaseEnergyPack100,
       shopOpen,
@@ -205,16 +144,7 @@ export function OffersProvider({ children }) {
       openShop,
       closeShop,
       openShopEnergyTab,
-      showOffer,
-      currentOffer,
-      popupTriggerType,
-      openOffer,
-      openOfferByTrigger,
-      closeOffer,
-      claimOffer,
       applyOfferReward,
-      tryEnergyPaywall,
-      onActiveFeedItemChange,
       activeFeedItemKey,
       setActiveFeedItemKey,
       coinWinFx,
@@ -225,14 +155,12 @@ export function OffersProvider({ children }) {
       clearLoseFx,
       dailyBonusOpen,
       claimDailyBonus,
-      getOfferByTrigger,
     }),
     [
       energy,
       coins,
-      energyPaywallOpen,
-      openEnergyPaywall,
-      closeEnergyPaywall,
+      energyPaywallInsertAfterVideoId,
+      scheduleEnergyPaywallAfterVideo,
       claimPartnerCasinoEnergy,
       purchaseEnergyPack100,
       shopOpen,
@@ -240,16 +168,7 @@ export function OffersProvider({ children }) {
       openShop,
       closeShop,
       openShopEnergyTab,
-      showOffer,
-      currentOffer,
-      popupTriggerType,
-      openOffer,
-      openOfferByTrigger,
-      closeOffer,
-      claimOffer,
       applyOfferReward,
-      tryEnergyPaywall,
-      onActiveFeedItemChange,
       activeFeedItemKey,
       coinWinFx,
       playCoinWinAnimation,

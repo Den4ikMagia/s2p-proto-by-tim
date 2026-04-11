@@ -20,7 +20,7 @@ export function VideoSlide({ id, src, isActive }) {
     energy,
     setEnergy,
     setCoins,
-    tryEnergyPaywall,
+    scheduleEnergyPaywallAfterVideo,
     playCoinWinAnimation,
     playLoseFeedback,
   } = useOffers();
@@ -38,7 +38,6 @@ export function VideoSlide({ id, src, isActive }) {
 
   function placeBet(isLowButton) {
     if (energy <= 0) {
-      tryEnergyPaywall();
       return;
     }
     setChosenBet(isLowButton ? "x2" : "x10");
@@ -47,7 +46,14 @@ export function VideoSlide({ id, src, isActive }) {
       "stack-of-coins",
       "classic-fail-wah-wah-wah-on-the-pipe",
     ]);
-    setEnergy((e) => e - 1);
+    setEnergy((e) => {
+      if (e <= 0) return e;
+      const next = e - 1;
+      if (next === 0) {
+        scheduleEnergyPaywallAfterVideo(id);
+      }
+      return next;
+    });
     const isWin =
       (isLowButton && winningIsLow) || (!isLowButton && !winningIsLow);
     if (isWin) {

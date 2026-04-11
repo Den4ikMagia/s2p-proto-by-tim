@@ -3,6 +3,7 @@ import { useOffers } from "../context/OffersContext";
 import { FeedOfferCard } from "./FeedOfferCard";
 import { SponsoredVideoSlide } from "./SponsoredVideoSlide";
 import { VideoSlide } from "./VideoSlide";
+import { EnergyPaywallSlide } from "./EnergyPaywallSlide";
 import "./VideoFeed.css";
 
 /**
@@ -10,17 +11,12 @@ import "./VideoFeed.css";
  */
 export function VideoFeed({ items }) {
   const feedRef = useRef(null);
-  const {
-    onActiveFeedItemChange,
-    setActiveFeedItemKey,
-    energyPaywallOpen,
-    dailyBonusOpen,
-  } = useOffers();
+  const { setActiveFeedItemKey, dailyBonusOpen } = useOffers();
   const [activeKey, setActiveKey] = useState(null);
 
   const feedLocked =
     Boolean(activeKey?.startsWith("sponsored_video:")) ||
-    energyPaywallOpen ||
+    Boolean(activeKey?.startsWith("energy_paywall:")) ||
     dailyBonusOpen;
 
   const updateActiveFromScroll = useCallback(() => {
@@ -60,11 +56,6 @@ export function VideoFeed({ items }) {
   useEffect(() => {
     setActiveFeedItemKey(activeKey);
   }, [activeKey, setActiveFeedItemKey]);
-
-  useEffect(() => {
-    if (!activeKey) return;
-    onActiveFeedItemChange(activeKey);
-  }, [activeKey, onActiveFeedItemChange]);
 
   useEffect(() => {
     const feed = feedRef.current;
@@ -167,6 +158,8 @@ export function VideoFeed({ items }) {
               onDismiss={() => scrollPastFeedItem(item.id)}
             />
           </div>
+        ) : item.type === "energy_paywall" ? (
+          <EnergyPaywallSlide key={item.id} slideId={item.id} />
         ) : (
           <VideoSlide
             key={item.id}

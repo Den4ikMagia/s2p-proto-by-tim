@@ -52,7 +52,7 @@ export function FeedOfferCard({ feedSlot, feedItemKey, onDismiss }) {
   if (offer.feedPlacement === "pass_through") {
     return (
       <section
-        className={`feed-offer feed-offer--pass-through feed-offer--${offer.kind}`}
+        className="feed-offer feed-offer--pass-through"
         aria-label="Рекламное предложение"
       >
         <FeedOfferPassThrough offer={offer} />
@@ -61,10 +61,7 @@ export function FeedOfferCard({ feedSlot, feedItemKey, onDismiss }) {
   }
 
   return (
-    <section
-      className={`feed-offer feed-offer--${offer.kind}`}
-      aria-label="Рекламное предложение"
-    >
+    <section className="feed-offer" aria-label="Рекламное предложение">
       <div className="feed-offer__body">
         <span
           className={`feed-offer__label feed-offer__label--${labelModifier(offer.uiLabel)}`}
