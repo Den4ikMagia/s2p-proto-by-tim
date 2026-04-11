@@ -18,6 +18,16 @@
   margin: 0 auto;
 }
 
+.video-slide__bets-row--single {
+  gap: 0;
+}
+
+.video-slide__bets-row--single .video-slide__btn {
+  flex: 0 1 auto;
+  min-width: 148px;
+  max-width: 220px;
+}
+
 .video-slide__btn {
   flex: 1;
   padding: 14px 16px;
@@ -39,6 +49,11 @@
 .video-slide__btn--accent {
   border-color: rgba(254, 44, 85, 0.6);
   background: rgba(254, 44, 85, 0.35);
+}
+
+.video-slide__btn:disabled {
+  cursor: default;
+  opacity: 0.72;
 }
 
 .video-slide__btn:active:not(:disabled) {

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { primeSfxFromUserGesture, preloadSfxBases } from "../audio/sfx";
 import { vibrateBetWin } from "../haptics";
 import { useOffers } from "../context/OffersContext";
@@ -13,9 +13,9 @@ function winningIsLowFromId(id) {
 }
 
 /**
- * @param {{ id: string, src: string }} props
+ * @param {{ id: string, src: string, isActive: boolean }} props
  */
-export function VideoSlide({ id, src }) {
+export function VideoSlide({ id, src, isActive }) {
   const {
     energy,
     setEnergy,
@@ -28,12 +28,22 @@ export function VideoSlide({ id, src }) {
   } = useOffers();
 
   const winningIsLow = useMemo(() => winningIsLowFromId(id), [id]);
+  const [chosenBet, setChosenBet] = useState(
+    /** @type {null | "x2" | "x10"} */ (null)
+  );
+
+  useEffect(() => {
+    if (!isActive) {
+      setChosenBet(null);
+    }
+  }, [isActive]);
 
   function placeBet(isLowButton) {
     if (energy <= 0) {
       tryEnergyPaywall();
       return;
     }
+    setChosenBet(isLowButton ? "x2" : "x10");
     primeSfxFromUserGesture();
     preloadSfxBases([
       "stack-of-coins",
@@ -76,21 +86,29 @@ export function VideoSlide({ id, src }) {
       <div className="video-feed__shade" aria-hidden />
 
       <div className="video-slide__bets">
-        <div className="video-slide__bets-row">
-          <button
-            type="button"
-            className={`video-slide__btn${dim ? " video-slide__btn--dim" : ""}`}
-            onClick={() => placeBet(true)}
-          >
-            ×2
-          </button>
-          <button
-            type="button"
-            className={`video-slide__btn video-slide__btn--accent${dim ? " video-slide__btn--dim" : ""}`}
-            onClick={() => placeBet(false)}
-          >
-            ×10
-          </button>
+        <div
+          className={`video-slide__bets-row${chosenBet ? " video-slide__bets-row--single" : ""}`}
+        >
+          {(chosenBet === null || chosenBet === "x2") && (
+            <button
+              type="button"
+              disabled={chosenBet !== null}
+              className={`video-slide__btn${dim ? " video-slide__btn--dim" : ""}`}
+              onClick={() => placeBet(true)}
+            >
+              ×2
+            </button>
+          )}
+          {(chosenBet === null || chosenBet === "x10") && (
+            <button
+              type="button"
+              disabled={chosenBet !== null}
+              className={`video-slide__btn video-slide__btn--accent${dim ? " video-slide__btn--dim" : ""}`}
+              onClick={() => placeBet(false)}
+            >
+              ×10
+            </button>
+          )}
         </div>
       </div>
     </section>

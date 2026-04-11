@@ -168,7 +168,12 @@ export function VideoFeed({ items }) {
             />
           </div>
         ) : (
-          <VideoSlide key={item.id} id={item.id} src={item.src ?? ""} />
+          <VideoSlide
+            key={item.id}
+            id={item.id}
+            src={item.src ?? ""}
+            isActive={activeKey === `video:${item.id}`}
+          />
         )
       )}
     </div>
