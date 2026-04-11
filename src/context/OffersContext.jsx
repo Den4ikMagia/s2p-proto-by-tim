@@ -113,10 +113,7 @@ export function OffersProvider({ children }) {
     }
     setDailyBonusOpen(false);
     primeSfxFromUserGesture();
-    preloadSfxBases([
-      "stack-of-coins",
-      "classic-fail-wah-wah-wah-on-the-pipe",
-    ]);
+    preloadSfxBases(["stack-of-coins", "cartoon-fail"]);
     setCoins((c) => c + DAILY_BONUS_COINS);
     playCoinWinAnimation(DAILY_BONUS_COINS);
     vibrateBetWin();

@@ -42,10 +42,7 @@ export function VideoSlide({ id, src, isActive }) {
     }
     setChosenBet(isLowButton ? "x2" : "x10");
     primeSfxFromUserGesture();
-    preloadSfxBases([
-      "stack-of-coins",
-      "classic-fail-wah-wah-wah-on-the-pipe",
-    ]);
+    preloadSfxBases(["stack-of-coins", "cartoon-fail"]);
     setEnergy((e) => {
       if (e <= 0) return e;
       const next = e - 1;

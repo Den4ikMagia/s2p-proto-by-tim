@@ -26,26 +26,8 @@ export function primeSfxFromUserGesture() {
   }
 }
 
-function pickExtension() {
-  const a = document.createElement("audio");
-  if (a.canPlayType('audio/mp4; codecs="mp4a.40.2"') || a.canPlayType("audio/aac")) {
-    return "m4a";
-  }
-  if (a.canPlayType('audio/ogg; codecs="vorbis"')) {
-    return "ogg";
-  }
-  return "m4a";
-}
-
-/**
- * @param {string} baseFile — имя без расширения, например "stack-of-coins"
- */
-export function sfxUrl(baseFile) {
-  return publicUrl(`sounds/${baseFile}.${pickExtension()}`);
-}
-
-function extensionFallbackOrder() {
-  return pickExtension() === "m4a" ? ["m4a", "ogg"] : ["ogg", "m4a"];
+function sfxMp3Url(baseFile) {
+  return publicUrl(`sounds/${baseFile}.mp3`);
 }
 
 function loadBuffer(url) {
@@ -66,18 +48,16 @@ function loadBuffer(url) {
 
 /**
  * Предзагрузка буферов после первого тапа (пока идёт анимация).
- * @param {string[]} baseFiles
+ * @param {string[]} baseFiles — имена без расширения, файлы в public/sounds/*.mp3
  */
 export function preloadSfxBases(baseFiles) {
   for (const base of baseFiles) {
-    for (const ext of extensionFallbackOrder()) {
-      void loadBuffer(publicUrl(`sounds/${base}.${ext}`)).catch(() => {});
-    }
+    void loadBuffer(sfxMp3Url(base)).catch(() => {});
   }
 }
 
 /**
- * @param {string} url — полный URL (sfxUrl / publicUrl)
+ * @param {string} url — полный URL
  * @param {number} [volume=1]
  * @returns {Promise<boolean>} удалось ли воспроизвести через Web Audio
  */
@@ -104,27 +84,19 @@ export async function playSfx(url, volume = 1) {
 }
 
 /**
- * Воспроизведение по базовому имени файла в public/sounds (пробует .m4a и .ogg).
+ * Воспроизведение по базовому имени файла в public/sounds/*.mp3
  * @param {string} baseFile — например "stack-of-coins"
  */
 export async function playSfxBase(baseFile, volume = 1) {
-  for (const ext of extensionFallbackOrder()) {
-    const url = publicUrl(`sounds/${baseFile}.${ext}`);
-    // eslint-disable-next-line no-await-in-loop
-    const ok = await playSfx(url, volume);
-    if (ok) return;
-  }
+  const url = sfxMp3Url(baseFile);
+  const ok = await playSfx(url, volume);
+  if (ok) return;
   const v = Math.max(0, Math.min(1, volume));
-  for (const ext of ["m4a", "ogg"]) {
-    const url = publicUrl(`sounds/${baseFile}.${ext}`);
-    try {
-      const audio = new Audio(url);
-      audio.volume = v;
-      // eslint-disable-next-line no-await-in-loop
-      await audio.play();
-      return;
-    } catch {
-      /* next */
-    }
+  try {
+    const audio = new Audio(url);
+    audio.volume = v;
+    await audio.play();
+  } catch {
+    /* ignore */
   }
 }

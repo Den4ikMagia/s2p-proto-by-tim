@@ -13,7 +13,7 @@ export function LoseFeedbackOverlay({ runId, onComplete }) {
   }, [runId, onComplete]);
 
   useEffect(() => {
-    void playSfxBase("classic-fail-wah-wah-wah-on-the-pipe", 0.72);
+    void playSfxBase("cartoon-fail", 0.72);
   }, [runId]);
 
   return (
