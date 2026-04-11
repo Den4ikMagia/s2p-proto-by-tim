@@ -2,16 +2,30 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+import { primeSfxFromUserGesture, preloadSfxBases } from "../audio/sfx";
+import { vibrateBetWin } from "../haptics";
 import { getOfferByTrigger } from "../offers/offers";
 
 /** @typedef {import("../offers/offers").Offer} Offer */
 /** @typedef {import("../offers/offers").OfferTrigger} OfferTrigger */
 
 const OffersContext = createContext(null);
+
+const START_BONUS_COINS = 100;
+const START_BONUS_STORAGE_KEY = "vf_start_bonus_claimed_v1";
+
+function isStartBonusClaimed() {
+  try {
+    return localStorage.getItem(START_BONUS_STORAGE_KEY) === "1";
+  } catch {
+    return true;
+  }
+}
 
 export function OffersProvider({ children }) {
   const [energy, setEnergy] = useState(3);
@@ -30,6 +44,7 @@ export function OffersProvider({ children }) {
   const [coinWinFx, setCoinWinFx] = useState(null);
   /** @type {[number | null, React.Dispatch<React.SetStateAction<number | null>>]} */
   const [loseFxRunId, setLoseFxRunId] = useState(/** @type {number | null} */ (null));
+  const [startBonusOpen, setStartBonusOpen] = useState(false);
 
   const onboardingDoneRef = useRef(false);
   const lastSwipeKeyRef = useRef(null);
@@ -128,6 +143,36 @@ export function OffersProvider({ children }) {
 
   const clearCoinWinFx = useCallback(() => setCoinWinFx(null), []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (isStartBonusClaimed()) {
+      setStartBonusOpen(false);
+      return;
+    }
+    setStartBonusOpen(coins === 0);
+  }, [coins]);
+
+  const claimStartBonus = useCallback(() => {
+    if (isStartBonusClaimed()) {
+      setStartBonusOpen(false);
+      return;
+    }
+    try {
+      localStorage.setItem(START_BONUS_STORAGE_KEY, "1");
+    } catch {
+      /* ignore */
+    }
+    setStartBonusOpen(false);
+    primeSfxFromUserGesture();
+    preloadSfxBases([
+      "stack-of-coins",
+      "classic-fail-wah-wah-wah-on-the-pipe",
+    ]);
+    setCoins((c) => c + START_BONUS_COINS);
+    playCoinWinAnimation(START_BONUS_COINS);
+    vibrateBetWin();
+  }, [playCoinWinAnimation]);
+
   const playLoseFeedback = useCallback(() => {
     setLoseFxRunId(Date.now());
   }, []);
@@ -187,6 +232,8 @@ export function OffersProvider({ children }) {
       loseFxRunId,
       playLoseFeedback,
       clearLoseFx,
+      startBonusOpen,
+      claimStartBonus,
       getOfferByTrigger,
     }),
     [
@@ -221,6 +268,8 @@ export function OffersProvider({ children }) {
       loseFxRunId,
       playLoseFeedback,
       clearLoseFx,
+      startBonusOpen,
+      claimStartBonus,
     ]
   );
 

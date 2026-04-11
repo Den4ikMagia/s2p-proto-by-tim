@@ -10,12 +10,18 @@ import "./VideoFeed.css";
  */
 export function VideoFeed({ items }) {
   const feedRef = useRef(null);
-  const { onActiveFeedItemChange, setActiveFeedItemKey, energyPaywallOpen } =
-    useOffers();
+  const {
+    onActiveFeedItemChange,
+    setActiveFeedItemKey,
+    energyPaywallOpen,
+    startBonusOpen,
+  } = useOffers();
   const [activeKey, setActiveKey] = useState(null);
 
   const feedLocked =
-    Boolean(activeKey?.startsWith("sponsored_video:")) || energyPaywallOpen;
+    Boolean(activeKey?.startsWith("sponsored_video:")) ||
+    energyPaywallOpen ||
+    startBonusOpen;
 
   const updateActiveFromScroll = useCallback(() => {
     const feed = feedRef.current;
