@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { primeSfxFromUserGesture, preloadSfxBases } from "../audio/sfx";
+import { vibrateBetWin } from "../haptics";
 import { useOffers } from "../context/OffersContext";
 import "./VideoSlide.css";
 
@@ -42,6 +43,7 @@ export function VideoSlide({ id, src }) {
     const isWin =
       (isLowButton && winningIsLow) || (!isLowButton && !winningIsLow);
     if (isWin) {
+      vibrateBetWin();
       const multVal = isLowButton ? 2 : 10;
       const delta = Math.round(10 * multVal * (0.8 + Math.random() * 0.4));
       setCoins((c) => c + delta);
