@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { primeSfxFromUserGesture, preloadSfxBases } from "../audio/sfx";
 import { useOffers } from "../context/OffersContext";
 import "./VideoSlide.css";
 
@@ -32,6 +33,11 @@ export function VideoSlide({ id, src }) {
       tryEnergyPaywall();
       return;
     }
+    primeSfxFromUserGesture();
+    preloadSfxBases([
+      "stack-of-coins",
+      "classic-fail-wah-wah-wah-on-the-pipe",
+    ]);
     setEnergy((e) => e - 1);
     const isWin =
       (isLowButton && winningIsLow) || (!isLowButton && !winningIsLow);

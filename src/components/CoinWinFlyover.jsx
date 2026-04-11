@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { playSfxBase } from "../audio/sfx";
 import { publicUrl } from "../publicUrl";
 import "./CoinWinFlyover.css";
 
 const COIN_IMG = publicUrl("coin-fly.png");
-const SOUND_SRC = publicUrl("sounds/stack-of-coins.ogg");
 const PARTICLE_COUNT = 22;
 
 /**
@@ -53,13 +53,7 @@ export function CoinWinFlyover({ amount, runId, onComplete, onCoinsFlyStart }) {
     if (phase !== "coinsFly" || flyStartedRef.current) return;
     flyStartedRef.current = true;
     onCoinsFlyStart?.();
-    try {
-      const audio = new Audio(SOUND_SRC);
-      audio.volume = 0.55;
-      void audio.play();
-    } catch {
-      /* ignore */
-    }
+    void playSfxBase("stack-of-coins", 0.55);
   }, [phase, onCoinsFlyStart]);
 
   const formatted = new Intl.NumberFormat("ru-RU").format(amount);

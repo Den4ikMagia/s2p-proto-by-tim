@@ -1,8 +1,6 @@
 import { useEffect } from "react";
-import { publicUrl } from "../publicUrl";
+import { playSfxBase } from "../audio/sfx";
 import "./LoseFeedbackOverlay.css";
-
-const SOUND_SRC = publicUrl("sounds/classic-fail-wah-wah-wah-on-the-pipe.ogg");
 const FX_MS = 780;
 
 /**
@@ -15,12 +13,7 @@ export function LoseFeedbackOverlay({ runId, onComplete }) {
   }, [runId, onComplete]);
 
   useEffect(() => {
-    const audio = new Audio(SOUND_SRC);
-    audio.volume = 0.72;
-    void audio.play().catch(() => {});
-    return () => {
-      audio.pause();
-    };
+    void playSfxBase("classic-fail-wah-wah-wah-on-the-pipe", 0.72);
   }, [runId]);
 
   return (
