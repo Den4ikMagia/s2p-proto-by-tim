@@ -120,18 +120,6 @@ export function OffersProvider({ children }) {
     setShopOpen(true);
   }, []);
 
-  const maybeOfferAfterWin = useCallback(() => {
-    if (Math.random() < 0.3) {
-      openOfferByTrigger("win");
-    }
-  }, [openOfferByTrigger]);
-
-  const maybeOfferAfterLose = useCallback(() => {
-    if (Math.random() < 0.5) {
-      openOfferByTrigger("lose");
-    }
-  }, [openOfferByTrigger]);
-
   /**
    * Считает смену центрального элемента ленты как свайп.
    * После 5 свайпов — onboarding-оффер (один раз).
@@ -221,8 +209,6 @@ export function OffersProvider({ children }) {
       claimOffer,
       applyOfferReward,
       tryEnergyPaywall,
-      maybeOfferAfterWin,
-      maybeOfferAfterLose,
       onActiveFeedItemChange,
       activeFeedItemKey,
       setActiveFeedItemKey,
@@ -258,8 +244,6 @@ export function OffersProvider({ children }) {
       claimOffer,
       applyOfferReward,
       tryEnergyPaywall,
-      maybeOfferAfterWin,
-      maybeOfferAfterLose,
       onActiveFeedItemChange,
       activeFeedItemKey,
       coinWinFx,

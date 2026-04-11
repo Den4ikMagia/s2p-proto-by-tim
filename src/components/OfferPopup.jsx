@@ -10,8 +10,6 @@ function labelModifier(uiLabel) {
 /** @type {Record<string, string>} */
 const TRIGGER_HEADLINE = {
   energy_paywall: "Get free energy",
-  win: "Double your win",
-  lose: "Try again with bonus",
   onboarding: "Welcome bonus",
 };
 

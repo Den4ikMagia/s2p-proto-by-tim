@@ -1,5 +1,5 @@
 /**
- * @typedef {"energy_paywall" | "win" | "lose" | "onboarding" | "feed_ad"} OfferTrigger
+ * @typedef {"energy_paywall" | "onboarding" | "feed_ad"} OfferTrigger
  */
 
 /**
@@ -44,32 +44,6 @@ const OFFER_ENERGY_PAYWALL = {
   cta: "Забрать энергию",
   rewardType: "energy",
   rewardValue: 50,
-};
-
-/** @type {Offer} */
-const OFFER_WIN_BETTING = {
-  id: "betting-bonus-win",
-  kind: "betting",
-  uiLabel: "Bonus",
-  title: "Сделай ставку и получи бонус",
-  description:
-    "Удачный раунд! Забери бонусные монеты и сыграй ещё раз с преимуществом.",
-  cta: "Получить бонус",
-  rewardType: "coins",
-  rewardValue: 40,
-};
-
-/** @type {Offer} */
-const OFFER_LOSE_BETTING = {
-  id: "betting-bonus-lose",
-  kind: "betting",
-  uiLabel: "Bonus",
-  title: "Сделай ставку и получи бонус",
-  description:
-    "Не повезло в этот раз — компенсируем часть энергии, чтобы ты остался в игре.",
-  cta: "Взять компенсацию",
-  rewardType: "energy",
-  rewardValue: 15,
 };
 
 /** @type {Offer} */
@@ -187,10 +161,6 @@ export function getOfferByTrigger(triggerType, feedSlotIndex = 0) {
   switch (triggerType) {
     case "energy_paywall":
       return OFFER_ENERGY_PAYWALL;
-    case "win":
-      return OFFER_WIN_BETTING;
-    case "lose":
-      return OFFER_LOSE_BETTING;
     case "onboarding":
       return OFFER_WELCOME;
     case "feed_ad":

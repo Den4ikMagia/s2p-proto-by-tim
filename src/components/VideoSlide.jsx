@@ -21,8 +21,6 @@ export function VideoSlide({ id, src, isActive }) {
     setEnergy,
     setCoins,
     tryEnergyPaywall,
-    maybeOfferAfterWin,
-    maybeOfferAfterLose,
     playCoinWinAnimation,
     playLoseFeedback,
   } = useOffers();
@@ -58,10 +56,8 @@ export function VideoSlide({ id, src, isActive }) {
       const delta = Math.round(10 * multVal * (0.8 + Math.random() * 0.4));
       setCoins((c) => c + delta);
       playCoinWinAnimation(delta);
-      maybeOfferAfterWin();
     } else {
       playLoseFeedback();
-      maybeOfferAfterLose();
     }
   }
 
