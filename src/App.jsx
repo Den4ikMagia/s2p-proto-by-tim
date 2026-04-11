@@ -5,7 +5,7 @@ import { OfferPopup } from "./components/OfferPopup";
 import { ShopModal } from "./components/ShopModal";
 import { CoinWinFlyover } from "./components/CoinWinFlyover";
 import { LoseFeedbackOverlay } from "./components/LoseFeedbackOverlay";
-import { StartBonusModal } from "./components/StartBonusModal";
+import { DailyBonusModal } from "./components/DailyBonusModal";
 import { VideoFeed } from "./components/VideoFeed";
 import { PROTOTYPE_VIDEOS, buildFeedItems } from "./constants/videos";
 import { publicUrl } from "./publicUrl";
@@ -113,7 +113,7 @@ function AppShell() {
         <LoseFeedbackOverlay runId={loseFxRunId} onComplete={clearLoseFx} />
       ) : null}
 
-      <StartBonusModal />
+      <DailyBonusModal />
       <EnergyPaywallModal />
       <ShopModal />
       <OfferPopup />

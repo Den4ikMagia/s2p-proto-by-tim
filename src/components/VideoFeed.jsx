@@ -14,14 +14,14 @@ export function VideoFeed({ items }) {
     onActiveFeedItemChange,
     setActiveFeedItemKey,
     energyPaywallOpen,
-    startBonusOpen,
+    dailyBonusOpen,
   } = useOffers();
   const [activeKey, setActiveKey] = useState(null);
 
   const feedLocked =
     Boolean(activeKey?.startsWith("sponsored_video:")) ||
     energyPaywallOpen ||
-    startBonusOpen;
+    dailyBonusOpen;
 
   const updateActiveFromScroll = useCallback(() => {
     const feed = feedRef.current;

@@ -16,12 +16,16 @@ import { getOfferByTrigger } from "../offers/offers";
 
 const OffersContext = createContext(null);
 
-const START_BONUS_COINS = 100;
-const START_BONUS_STORAGE_KEY = "vf_start_bonus_claimed_v1";
+const DAILY_BONUS_COINS = 500;
+const DAILY_BONUS_STORAGE_KEY = "vf_daily_bonus_claimed_v1";
+const LEGACY_START_BONUS_KEY = "vf_start_bonus_claimed_v1";
 
-function isStartBonusClaimed() {
+function isDailyBonusClaimed() {
   try {
-    return localStorage.getItem(START_BONUS_STORAGE_KEY) === "1";
+    const lc = localStorage;
+    if (lc.getItem(DAILY_BONUS_STORAGE_KEY) === "1") return true;
+    if (lc.getItem(LEGACY_START_BONUS_KEY) === "1") return true;
+    return false;
   } catch {
     return true;
   }
@@ -44,7 +48,7 @@ export function OffersProvider({ children }) {
   const [coinWinFx, setCoinWinFx] = useState(null);
   /** @type {[number | null, React.Dispatch<React.SetStateAction<number | null>>]} */
   const [loseFxRunId, setLoseFxRunId] = useState(/** @type {number | null} */ (null));
-  const [startBonusOpen, setStartBonusOpen] = useState(false);
+  const [dailyBonusOpen, setDailyBonusOpen] = useState(false);
 
   const onboardingDoneRef = useRef(false);
   const lastSwipeKeyRef = useRef(null);
@@ -133,31 +137,32 @@ export function OffersProvider({ children }) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (isStartBonusClaimed()) {
-      setStartBonusOpen(false);
+    if (isDailyBonusClaimed()) {
+      setDailyBonusOpen(false);
       return;
     }
-    setStartBonusOpen(coins === 0);
+    setDailyBonusOpen(coins === 0);
   }, [coins]);
 
-  const claimStartBonus = useCallback(() => {
-    if (isStartBonusClaimed()) {
-      setStartBonusOpen(false);
+  const claimDailyBonus = useCallback(() => {
+    if (isDailyBonusClaimed()) {
+      setDailyBonusOpen(false);
       return;
     }
     try {
-      localStorage.setItem(START_BONUS_STORAGE_KEY, "1");
+      localStorage.setItem(DAILY_BONUS_STORAGE_KEY, "1");
+      localStorage.setItem(LEGACY_START_BONUS_KEY, "1");
     } catch {
       /* ignore */
     }
-    setStartBonusOpen(false);
+    setDailyBonusOpen(false);
     primeSfxFromUserGesture();
     preloadSfxBases([
       "stack-of-coins",
       "classic-fail-wah-wah-wah-on-the-pipe",
     ]);
-    setCoins((c) => c + START_BONUS_COINS);
-    playCoinWinAnimation(START_BONUS_COINS);
+    setCoins((c) => c + DAILY_BONUS_COINS);
+    playCoinWinAnimation(DAILY_BONUS_COINS);
     vibrateBetWin();
   }, [playCoinWinAnimation]);
 
@@ -218,8 +223,8 @@ export function OffersProvider({ children }) {
       loseFxRunId,
       playLoseFeedback,
       clearLoseFx,
-      startBonusOpen,
-      claimStartBonus,
+      dailyBonusOpen,
+      claimDailyBonus,
       getOfferByTrigger,
     }),
     [
@@ -252,8 +257,8 @@ export function OffersProvider({ children }) {
       loseFxRunId,
       playLoseFeedback,
       clearLoseFx,
-      startBonusOpen,
-      claimStartBonus,
+      dailyBonusOpen,
+      claimDailyBonus,
     ]
   );
 
