@@ -53,7 +53,8 @@ function AppShell() {
 
   const isSponsoredVideoActive = Boolean(
     activeFeedItemKey?.startsWith("sponsored_video:") ||
-      activeFeedItemKey?.startsWith("energy_paywall:")
+      activeFeedItemKey?.startsWith("energy_paywall:") ||
+      activeFeedItemKey?.startsWith("fortune_wheel:")
   );
 
   const [coinBalancePulse, setCoinBalancePulse] = useState(false);

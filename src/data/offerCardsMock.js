@@ -11,6 +11,7 @@
  * @property {string} image
  * @property {string} logo
  * @property {number} rating — для блока Rating (отображается как x.xx/10)
+ * @property {{ value: string, label: string }[]} [fortune_stats] — три ячейки под модалку Fortune Wheel
  */
 
 /** @type {OfferCardMock[]} */
@@ -27,6 +28,11 @@ export const OFFER_CARDS_MOCK = [
       "https://admin.battleme.club/uploads/GIZBO_NEW_f1a4d2c340.png",
     logo: "https://admin.battleme.club/uploads/Ellipse_10_adb3aae89f.png",
     rating: 9.45,
+    fortune_stats: [
+      { value: "150%", label: "НА ДЕПОЗИТ" },
+      { value: "30 000 ₽", label: "МАКС БОНУС" },
+      { value: "x40", label: "ВЕЙДЖЕР" },
+    ],
   },
   {
     id: 11,
@@ -39,6 +45,11 @@ export const OFFER_CARDS_MOCK = [
     image: "https://admin.battleme.club/uploads/LEX_NEW_1125c8e31f.png",
     logo: "https://admin.battleme.club/uploads/Lex_Logo_7624667d3a.png",
     rating: 9.62,
+    fortune_stats: [
+      { value: "200%", label: "НА ДЕПОЗИТ" },
+      { value: "30 000 ₽", label: "МАКС БОНУС" },
+      { value: "x40", label: "ВЕЙДЖЕР" },
+    ],
   },
   {
     id: 15,
@@ -52,6 +63,11 @@ export const OFFER_CARDS_MOCK = [
       "https://admin.battleme.club/uploads/VODKA_BET_offer_97e1d44484.png",
     logo: "https://admin.battleme.club/uploads/VODKA_cc9010a042.png",
     rating: 9.38,
+    fortune_stats: [
+      { value: "150%", label: "ДЕПОЗИТ" },
+      { value: "300 FS", label: "ФРИСПИНЫ" },
+      { value: "x40", label: "ВЕЙДЖЕР" },
+    ],
   },
   {
     id: 14,
@@ -64,6 +80,11 @@ export const OFFER_CARDS_MOCK = [
     image: "https://admin.battleme.club/uploads/R7_NEW_cd4705c395.png",
     logo: "https://admin.battleme.club/uploads/R7_fd50289d39.png",
     rating: 9.71,
+    fortune_stats: [
+      { value: "50%", label: "ДЕПОЗИТ" },
+      { value: "20 €", label: "БОНУС" },
+      { value: "x50", label: "ВЕЙДЖЕР" },
+    ],
   },
   {
     id: 17,
@@ -77,6 +98,11 @@ export const OFFER_CARDS_MOCK = [
     logo:
       "https://admin.battleme.club/uploads/dragon_money_08891fc5b3.png",
     rating: 9.22,
+    fortune_stats: [
+      { value: "10%", label: "КЭШБЭК" },
+      { value: "—", label: "БОНУС" },
+      { value: "x3", label: "ВЕЙДЖЕР" },
+    ],
   },
   {
     id: 16,
@@ -89,5 +115,13 @@ export const OFFER_CARDS_MOCK = [
     logo:
       "https://admin.battleme.club/uploads/BC_Game_Logo_8a4ae773c7.png",
     rating: 9.55,
+    fortune_stats: [
+      { value: "180%", label: "НА 1-Й ДЕПОЗИТ" },
+      { value: "20 000 $", label: "МАКС БОНУС" },
+      { value: "—", label: "ВЕЙДЖЕР" },
+    ],
   },
 ];
+
+/** Первые 6 карточек для сегментов колеса Fortune Wheel */
+export const FORTUNE_WHEEL_SEGMENTS = OFFER_CARDS_MOCK.slice(0, 6);

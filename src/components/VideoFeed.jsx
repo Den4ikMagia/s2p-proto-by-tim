@@ -4,6 +4,7 @@ import { FeedOfferCard } from "./FeedOfferCard";
 import { SponsoredVideoSlide } from "./SponsoredVideoSlide";
 import { VideoSlide } from "./VideoSlide";
 import { EnergyPaywallSlide } from "./EnergyPaywallSlide";
+import { FortuneWheelSlide } from "./FortuneWheelSlide";
 import "./VideoFeed.css";
 
 /**
@@ -21,6 +22,7 @@ export function VideoFeed({ items }) {
   const feedLocked =
     Boolean(activeKey?.startsWith("sponsored_video:")) ||
     Boolean(activeKey?.startsWith("energy_paywall:")) ||
+    Boolean(activeKey?.startsWith("fortune_wheel:")) ||
     dailyBonusOpen;
 
   const updateActiveFromScroll = useCallback(() => {
@@ -194,6 +196,12 @@ export function VideoFeed({ items }) {
           </div>
         ) : item.type === "energy_paywall" ? (
           <EnergyPaywallSlide key={item.id} slideId={item.id} />
+        ) : item.type === "fortune_wheel" ? (
+          <FortuneWheelSlide
+            key={item.id}
+            slideId={item.id}
+            onDismiss={() => scrollPastFeedItem(item.id)}
+          />
         ) : (
           <VideoSlide
             key={item.id}

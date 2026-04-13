@@ -68,6 +68,13 @@ export function buildFeedItems(videos) {
         feedSlot: feedSlot++,
       });
     }
+
+    if (i === 5) {
+      items.push({
+        type: "fortune_wheel",
+        id: `fortune-wheel-after-${v.id}`,
+      });
+    }
   }
   return items;
 }

@@ -1,0 +1,137 @@
+.fortune-offer-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  pointer-events: auto;
+}
+
+.fortune-offer-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.fortune-offer-modal__card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 340px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #14101c 0%, #0a0810 100%);
+  padding: 0 0 20px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55);
+}
+
+.fortune-offer-modal__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.fortune-offer-modal__close:active {
+  opacity: 0.85;
+}
+
+.fortune-offer-modal__banner {
+  border-radius: 20px 20px 0 0;
+  overflow: hidden;
+  background: #1a1424;
+}
+
+.fortune-offer-modal__banner-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(160px, 28vh);
+  object-fit: cover;
+  object-position: center;
+}
+
+.fortune-offer-modal__headline {
+  margin: 16px 18px 0;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #fff;
+  text-align: center;
+}
+
+.fortune-offer-modal__stats {
+  display: flex;
+  gap: 8px;
+  margin: 18px 14px 0;
+  justify-content: center;
+}
+
+.fortune-offer-modal__stat {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.fortune-offer-modal__stat-val {
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.fortune-offer-modal__stat-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+}
+
+.fortune-offer-modal__cta {
+  display: block;
+  width: calc(100% - 28px);
+  margin: 20px 14px 0;
+  padding: 16px 20px;
+  border: none;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.fortune-offer-modal__cta:active {
+  filter: brightness(1.05);
+}
+
+.fortune-offer-modal__legal {
+  margin: 14px 0 0;
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+}

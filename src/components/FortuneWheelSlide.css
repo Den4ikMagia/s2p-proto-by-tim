@@ -1,0 +1,95 @@
+.fortune-wheel-slide {
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: max(20px, env(safe-area-inset-top)) 18px
+    max(24px, env(safe-area-inset-bottom));
+  background: radial-gradient(ellipse 120% 80% at 50% 20%, #1e1630 0%, #08060c 55%);
+  color: #fff;
+}
+
+.fortune-wheel-slide__title {
+  margin: 0 0 20px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.fortune-wheel-slide__stage {
+  position: relative;
+  width: min(98vw, 420px);
+}
+
+.fortune-wheel-slide__pointer {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  z-index: 4;
+  pointer-events: none;
+  transform: translate(-50%, 18%);
+}
+
+.fortune-wheel-slide__pointer-img {
+  display: block;
+  width: min(36px, 17vw);
+  height: auto;
+  max-height: min(88px, 20vw);
+  object-fit: contain;
+  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.5));
+}
+
+.fortune-wheel-slide__wheel-wrap {
+  position: relative;
+  width: min(92vw, 380px);
+  height: min(92vw, 380px);
+  margin: 0 auto;
+}
+
+.fortune-wheel-slide__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 4px rgba(255, 255, 255, 0.12),
+    0 16px 40px rgba(0, 0, 0, 0.55);
+}
+
+.fortune-wheel-slide__svg--animating {
+  transition: transform 4.2s cubic-bezier(0.12, 0.72, 0.12, 0.99);
+  will-change: transform;
+}
+
+.fortune-wheel-slide__spin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  width: min(96px, 24vw);
+  height: min(96px, 24vw);
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  background: linear-gradient(180deg, #2a2438 0%, #12101a 100%);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.fortune-wheel-slide__spin:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.fortune-wheel-slide__spin:active:not(:disabled) {
+  transform: translate(-50%, -50%) scale(0.97);
+}
