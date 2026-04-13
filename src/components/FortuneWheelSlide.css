@@ -60,8 +60,9 @@
     0 16px 40px rgba(0, 0, 0, 0.55);
 }
 
+/* 4s под длину koleso-fortunyi--ostanavlivaetsya.mp3; быстрый разгон, плавное замедление в конце */
 .fortune-wheel-slide__svg--animating {
-  transition: transform 4.2s cubic-bezier(0.12, 0.72, 0.12, 0.99);
+  transition: transform 4s cubic-bezier(0.12, 0.82, 0.18, 1);
   will-change: transform;
 }
 

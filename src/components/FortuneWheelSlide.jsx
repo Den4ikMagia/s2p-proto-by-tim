@@ -1,7 +1,15 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  playSfxBase,
+  preloadSfxBases,
+  primeSfxFromUserGesture,
+} from "../audio/sfx";
 import { FORTUNE_WHEEL_SEGMENTS } from "../data/offerCardsMock";
 import { FortuneWheelOfferModal } from "./FortuneWheelOfferModal";
 import "./FortuneWheelSlide.css";
+
+/** public/sounds/koleso-fortunyi--ostanavlivaetsya.mp3 — длительность совпадает с анимацией */
+const FORTUNE_SPIN_SFX_BASE = "koleso-fortunyi--ostanavlivaetsya";
 
 const FORTUNE_WHEEL_POINTER_SRC =
   "https://battleme.club/assets/arrow-CscS0JHK.png";
@@ -42,12 +50,18 @@ export function FortuneWheelSlide({ slideId, onDismiss }) {
   const [modalOffer, setModalOffer] = useState(null);
   const pendingWinRef = useRef(/** @type {number | null} */ (null));
 
+  useEffect(() => {
+    preloadSfxBases([FORTUNE_SPIN_SFX_BASE]);
+  }, []);
+
   const handleSpin = useCallback(() => {
     if (spinning || segments.length < SEGMENTS) return;
     const winIndex = Math.floor(Math.random() * SEGMENTS);
     pendingWinRef.current = winIndex;
     const spins = 5 + Math.floor(Math.random() * 3);
     const offset = 360 - (winIndex * SEG_DEG + SEG_DEG / 2);
+    primeSfxFromUserGesture();
+    void playSfxBase(FORTUNE_SPIN_SFX_BASE, 0.88);
     setSpinning(true);
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
