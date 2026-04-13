@@ -13,6 +13,10 @@ export function VideoFeed({ items }) {
   const feedRef = useRef(null);
   const { setActiveFeedItemKey, dailyBonusOpen } = useOffers();
   const [activeKey, setActiveKey] = useState(null);
+  const [swipeTeaseVideoId, setSwipeTeaseVideoId] = useState(
+    /** @type {string | null} */ (null)
+  );
+  const [swipeTeasePulse, setSwipeTeasePulse] = useState(false);
 
   const feedLocked =
     Boolean(activeKey?.startsWith("sponsored_video:")) ||
@@ -98,6 +102,36 @@ export function VideoFeed({ items }) {
     [updateActiveFromScroll]
   );
 
+  const startSwipeTease = useCallback((id) => {
+    setSwipeTeaseVideoId(id);
+  }, []);
+
+  useEffect(() => {
+    if (!swipeTeaseVideoId) {
+      setSwipeTeasePulse(false);
+      return;
+    }
+    if (feedLocked || activeKey !== `video:${swipeTeaseVideoId}`) {
+      setSwipeTeasePulse(false);
+      return;
+    }
+    let pullTimer = 0;
+    let pauseTimer = 0;
+    const runCycle = () => {
+      setSwipeTeasePulse(true);
+      pullTimer = window.setTimeout(() => {
+        setSwipeTeasePulse(false);
+        pauseTimer = window.setTimeout(runCycle, 3500);
+      }, 420);
+    };
+    runCycle();
+    return () => {
+      window.clearTimeout(pullTimer);
+      window.clearTimeout(pauseTimer);
+      setSwipeTeasePulse(false);
+    };
+  }, [swipeTeaseVideoId, activeKey, feedLocked]);
+
   useEffect(() => {
     const feed = feedRef.current;
     if (!feed) return;
@@ -166,6 +200,12 @@ export function VideoFeed({ items }) {
             id={item.id}
             src={item.src ?? ""}
             isActive={activeKey === `video:${item.id}`}
+            teaseSwipeActive={
+              swipeTeasePulse &&
+              swipeTeaseVideoId === item.id &&
+              activeKey === `video:${item.id}`
+            }
+            onSwipeHintShown={startSwipeTease}
           />
         )
       )}
