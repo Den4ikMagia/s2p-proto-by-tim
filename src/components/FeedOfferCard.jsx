@@ -25,8 +25,8 @@ export function FeedOfferCard({ feedSlot, feedItemKey, onDismiss }) {
   const rewardClaimedRef = useRef(false);
 
   const offer = useMemo(
-    () => getOfferByTrigger("feed_ad", feedSlot),
-    [feedSlot]
+    () => getOfferByTrigger("feed_ad", feedSlot, feedItemKey),
+    [feedSlot, feedItemKey]
   );
 
   const partnerUrl = offer.partnerUrl ?? FEED_AD_PARTNER_URL_DEFAULT;

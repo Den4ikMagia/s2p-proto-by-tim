@@ -6,7 +6,7 @@ import "./FeedOfferPassThrough.css";
 /**
  * Пропускной плейсмент: карточка партнёра по центру, PLAY NOW + NO ADS, без skip/таймера.
  *
- * @param {{ offer: { partnerUrl?: string, rewardType: string, rewardValue: number, brandImageUrl?: string, brandImageAlt?: string, passThroughWelcomeLabel?: string, passThroughHeadline?: string, passThroughRatingScore?: string } }} props
+ * @param {{ offer: { cta?: string, partnerUrl?: string, rewardType: string, rewardValue: number, brandImageUrl?: string, brandImageAlt?: string, brandLogoUrl?: string, backgroundColor?: string, passThroughWelcomeLabel?: string, passThroughHeadline?: string, passThroughRatingScore?: string } }} props
  */
 export function FeedOfferPassThrough({ offer }) {
   const { applyOfferReward, openShop } = useOffers();
@@ -14,6 +14,15 @@ export function FeedOfferPassThrough({ offer }) {
 
   const partnerUrl = offer.partnerUrl ?? FEED_AD_PARTNER_URL_DEFAULT;
   const brandImageUrl = offer.brandImageUrl;
+  const brandLogoUrl = offer.brandLogoUrl;
+  const bg = offer.backgroundColor;
+
+  const sectionStyle =
+    bg != null && bg !== ""
+      ? {
+          background: `linear-gradient(180deg, ${bg}33 0%, #050508 55%)`,
+        }
+      : undefined;
 
   function handlePlayNow() {
     if (!rewardClaimedRef.current) {
@@ -28,9 +37,22 @@ export function FeedOfferPassThrough({ offer }) {
   }
 
   return (
-    <section className="feed-offer-pass" aria-label="Рекламное предложение">
+    <section
+      className="feed-offer-pass"
+      aria-label="Рекламное предложение"
+      style={sectionStyle}
+    >
       <div className="feed-offer-pass__center">
         <div className="feed-offer-pass__brand-slot">
+          {brandLogoUrl ? (
+            <img
+              className="feed-offer-pass__logo"
+              src={brandLogoUrl}
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+          ) : null}
           {brandImageUrl ? (
             <img
               className="feed-offer-pass__brand-img"
@@ -104,7 +126,7 @@ export function FeedOfferPassThrough({ offer }) {
           className="feed-offer-pass__play"
           onClick={handlePlayNow}
         >
-          PLAY NOW
+          {offer.cta ?? "PLAY NOW"}
         </button>
       </div>
     </section>

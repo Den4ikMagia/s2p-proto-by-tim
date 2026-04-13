@@ -1,3 +1,5 @@
+import { OFFER_CARDS_MOCK } from "../data/offerCardsMock";
+
 /**
  * @typedef {"feed_ad"} OfferTrigger
  */
@@ -24,118 +26,104 @@
  * @property {'standard' | 'pass_through'} [feedPlacement]
  * @property {string} [brandImageUrl]
  * @property {string} [brandImageAlt]
+ * @property {string} [brandLogoUrl]
+ * @property {string} [backgroundColor]
  * @property {string} [passThroughWelcomeLabel]
  * @property {string} [passThroughHeadline]
- * @property {string} [passThroughRatingScore] — например "9.71" для блока Rating
+ * @property {string} [passThroughRatingScore]
  */
 
-/** Плейсхолдер; замените на реальный URL партнёра */
+/** Плейсхолдер, если в моке нет ссылки */
 export const FEED_AD_PARTNER_URL_DEFAULT =
   "https://example.com/partner?utm_source=in_feed";
 
 /**
- * Библиотека пропускных плейсментов (изображение + welcome-текст, без таймера).
- * @type {Offer[]}
+ * @param {string} s
  */
-const FEED_PASS_THROUGH_LIBRARY = [
-  {
-    id: "feed-pass-haksr",
-    kind: "betting",
-    uiLabel: "Bonus",
-    title: "Лимитированный буст энергии",
-    description: "",
-    cta: "PLAY NOW",
-    rewardType: "energy",
-    rewardValue: 12,
-    partnerUrl: `${FEED_AD_PARTNER_URL_DEFAULT}&placement=pass&brand=haksr`,
-    feedPlacement: "pass_through",
-    brandImageUrl:
-      "https://www.betpack.com/imgs/bookmakers/h320/1705410758_HAKSR.webp",
-    brandImageAlt: "Partner",
-    passThroughWelcomeLabel: "Welcome offer",
-    passThroughHeadline: "200% up to €2000 + 150 Free Spins on top games",
-    passThroughRatingScore: "9.83",
-  },
-  {
-    id: "feed-pass-lunubet",
-    kind: "betting",
-    uiLabel: "Bonus",
-    title: "Лимитированный буст энергии",
-    description: "",
-    cta: "PLAY NOW",
-    rewardType: "energy",
-    rewardValue: 15,
-    partnerUrl: `${FEED_AD_PARTNER_URL_DEFAULT}&placement=pass&brand=lunubet`,
-    feedPlacement: "pass_through",
-    brandImageUrl:
-      "https://www.betpack.com/imgs/bookmakers/h320/1721299525_pIXrd.webp",
-    brandImageAlt: "Lunubet",
-    passThroughWelcomeLabel: "Welcome offer",
-    passThroughHeadline:
-      "350% first deposit boost + 200 Free Spins in hit slots",
-    passThroughRatingScore: "9.76",
-  },
-  {
-    id: "feed-pass-pinnacle",
-    kind: "betting",
-    uiLabel: "Bonus",
-    title: "Лимитированный буст энергии",
-    description: "",
-    cta: "PLAY NOW",
-    rewardType: "coins",
-    rewardValue: 30,
-    partnerUrl: `${FEED_AD_PARTNER_URL_DEFAULT}&placement=pass&brand=pinnacle`,
-    feedPlacement: "pass_through",
-    brandImageUrl:
-      "https://www.betpack.com/imgs/bookmakers/h320/1720008819_wVVdw.webp",
-    brandImageAlt: "Partner",
-    passThroughWelcomeLabel: "Sports welcome",
-    passThroughHeadline:
-      "100% up to €500 + insured first bet on prematch & live",
-    passThroughRatingScore: "9.88",
-  },
-  {
-    id: "feed-pass-boomerang",
-    kind: "betting",
-    uiLabel: "Bonus",
-    title: "Лимитированный буст энергии",
-    description: "",
-    cta: "PLAY NOW",
-    rewardType: "energy",
-    rewardValue: 18,
-    partnerUrl: `${FEED_AD_PARTNER_URL_DEFAULT}&placement=pass&brand=boomerang`,
-    feedPlacement: "pass_through",
-    brandImageUrl:
-      "https://www.betpack.com/imgs/bookmakers/h320/1707390227_xrWPF.webp",
-    brandImageAlt: "Partner",
-    passThroughWelcomeLabel: "Welcome pack",
-    passThroughHeadline:
-      "150% up to €2500 + 100 FS + weekly cashback for new players",
-    passThroughRatingScore: "9.71",
-  },
-];
+function hashString(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = (h * 31 + s.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h);
+}
 
 /**
- * В ленте только пропускные офферы — ротация по слоту.
- * @param {number} feedSlotIndex
+ * @param {number} rating
+ */
+function formatRatingScore(rating) {
+  const n = Number(rating);
+  if (!Number.isFinite(n)) return "9.50";
+  return n.toFixed(2);
+}
+
+/**
+ * @param {object} card — элемент из `OFFER_CARDS_MOCK`
  * @returns {Offer}
  */
-export function getFeedOfferForSlot(feedSlotIndex) {
-  const slot = Math.max(0, Math.floor(feedSlotIndex));
-  const n = FEED_PASS_THROUGH_LIBRARY.length;
-  return FEED_PASS_THROUGH_LIBRARY[slot % n];
+export function mapOfferCardMockToOffer(card) {
+  return {
+    id: `offer-card-${card.id}`,
+    kind: "betting",
+    uiLabel: "Bonus",
+    title: card.title,
+    description: card.description,
+    cta: card.cta_text,
+    rewardType: "energy",
+    rewardValue: 12 + (Number(card.id) % 7),
+    partnerUrl: card.brand_url,
+    feedPlacement: "pass_through",
+    brandImageUrl: card.image,
+    brandImageAlt: card.title,
+    brandLogoUrl: card.logo,
+    backgroundColor: card.background_color,
+    passThroughWelcomeLabel: card.title,
+    passThroughHeadline: card.description,
+    passThroughRatingScore: formatRatingScore(card.rating),
+  };
+}
+
+/**
+ * Псевдослучайный индекс карточки по ключу элемента ленты (стабильно на время сессии карточки).
+ * @param {number} feedSlotIndex
+ * @param {string} [feedItemKey]
+ */
+function pickOfferCardIndex(feedSlotIndex, feedItemKey) {
+  const list = OFFER_CARDS_MOCK;
+  const n = list.length;
+  if (n === 0) return 0;
+  const key =
+    feedItemKey != null && feedItemKey !== ""
+      ? `${feedItemKey}:${feedSlotIndex}`
+      : `slot:${feedSlotIndex}`;
+  return hashString(key) % n;
+}
+
+/**
+ * В ленте — карточка из мока по слоту и ключу (разные карточки для разных слотов).
+ * @param {number} feedSlotIndex
+ * @param {string} [feedItemKey]
+ * @returns {Offer}
+ */
+export function getFeedOfferForSlot(feedSlotIndex, feedItemKey) {
+  const idx = pickOfferCardIndex(
+    Math.max(0, Math.floor(feedSlotIndex)),
+    feedItemKey
+  );
+  return mapOfferCardMockToOffer(OFFER_CARDS_MOCK[idx]);
 }
 
 /**
  * @param {OfferTrigger} triggerType
- * @param {number} [feedSlotIndex=0] — для feed_ad: слот в ленте
+ * @param {number} [feedSlotIndex=0]
+ * @param {string} [feedItemKey] — для feed_ad: стабильный «рандом» по ключу элемента ленты
  * @returns {Offer}
  */
-export function getOfferByTrigger(triggerType, feedSlotIndex = 0) {
+export function getOfferByTrigger(triggerType, feedSlotIndex = 0, feedItemKey) {
   switch (triggerType) {
     case "feed_ad":
-      return getFeedOfferForSlot(feedSlotIndex);
+      return getFeedOfferForSlot(feedSlotIndex, feedItemKey);
     default:
-      return FEED_PASS_THROUGH_LIBRARY[0];
+      return mapOfferCardMockToOffer(OFFER_CARDS_MOCK[0]);
   }
 }
