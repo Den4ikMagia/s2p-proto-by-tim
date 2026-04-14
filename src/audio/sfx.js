@@ -1,4 +1,5 @@
 import { publicUrl } from "../publicUrl";
+import { isSoundEnabled } from "../telegram";
 
 /** @type {AudioContext | null} */
 let ctx = null;
@@ -88,6 +89,7 @@ export async function playSfx(url, volume = 1) {
  * @param {string} baseFile — например "stack-of-coins"
  */
 export async function playSfxBase(baseFile, volume = 1) {
+  if (!isSoundEnabled()) return;
   const url = sfxMp3Url(baseFile);
   const ok = await playSfx(url, volume);
   if (ok) return;
