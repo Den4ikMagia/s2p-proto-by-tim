@@ -345,17 +345,11 @@ function AppShell() {
         />
       ) : (
         <>
-          <VideoFeed items={items} />
-          <button
-            type="button"
-            className="app-shell__level-spin-entry"
-            onClick={() => setLevelSpinOpen(true)}
-          >
-            <span>🎡 Level Spin</span>
-            <small>
-              spins: {Math.floor(coins / LEVEL_SPIN_CONFIG.SpinCost)}
-            </small>
-          </button>
+          <VideoFeed
+            items={items}
+            availableLevelSpins={Math.floor(coins / LEVEL_SPIN_CONFIG.SpinCost)}
+            onOpenLevelSpin={() => setLevelSpinOpen(true)}
+          />
         </>
       )}
 

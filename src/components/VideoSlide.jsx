@@ -1,8 +1,29 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import Lottie from "lottie-react";
 import { primeSfxFromUserGesture, preloadSfxBases } from "../audio/sfx";
 import { vibrateBetWin } from "../haptics";
 import { useOffers } from "../context/OffersContext";
+import { publicUrl } from "../publicUrl";
 import "./VideoSlide.css";
+
+let fortuneWheelAnimData = null;
+let fortuneWheelAnimPromise = null;
+
+function loadFortuneWheelAnimation() {
+  if (fortuneWheelAnimData) return Promise.resolve(fortuneWheelAnimData);
+  if (fortuneWheelAnimPromise) return fortuneWheelAnimPromise;
+  fortuneWheelAnimPromise = fetch(publicUrl("animations/fortune wheel.json"))
+    .then((res) => {
+      if (!res.ok) throw new Error(String(res.status));
+      return res.json();
+    })
+    .then((json) => {
+      fortuneWheelAnimData = json;
+      return json;
+    })
+    .catch(() => null);
+  return fortuneWheelAnimPromise;
+}
 
 function winningIsLowFromId(id) {
   let h = 0;
@@ -13,12 +34,22 @@ function winningIsLowFromId(id) {
 }
 
 /**
- * @param {{ id: string, src: string, isActive: boolean, teaseSwipeActive?: boolean, onSwipeHintShown?: (id: string) => void }} props
+ * @param {{
+ *  id: string,
+ *  src: string,
+ *  isActive: boolean,
+ *  availableLevelSpins?: number,
+ *  onOpenLevelSpin?: () => void,
+ *  teaseSwipeActive?: boolean,
+ *  onSwipeHintShown?: (id: string) => void
+ * }} props
  */
 export function VideoSlide({
   id,
   src,
   isActive,
+  availableLevelSpins = 0,
+  onOpenLevelSpin,
   teaseSwipeActive = false,
   onSwipeHintShown,
 }) {
@@ -38,6 +69,8 @@ export function VideoSlide({
   const [betsVisible, setBetsVisible] = useState(false);
   const [betButtonExit, setBetButtonExit] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(false);
+  const [wheelAnimData, setWheelAnimData] = useState(null);
+  const [wheelAnimRun, setWheelAnimRun] = useState(0);
   const revealTimerRef = useRef(/** @type {number | null} */ (null));
   const resolveTimerRef = useRef(/** @type {number | null} */ (null));
   const postResultTimerRef = useRef(/** @type {number | null} */ (null));
@@ -102,6 +135,23 @@ export function VideoSlide({
     swipeHintNotifiedRef.current = true;
     onSwipeHintShown?.(id);
   }, [showSwipeHint, isActive, onSwipeHintShown, id]);
+
+  const showLevelSpinEntry =
+    isActive && betsVisible && chosenBet === null && availableLevelSpins > 0;
+
+  useEffect(() => {
+    if (!showLevelSpinEntry) return;
+    setWheelAnimRun((n) => n + 1);
+    if (wheelAnimData) return;
+    let cancelled = false;
+    void loadFortuneWheelAnimation().then((json) => {
+      if (cancelled || !json) return;
+      setWheelAnimData(json);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [showLevelSpinEntry, wheelAnimData]);
 
   function placeBet(isLowButton) {
     if (!isActive || !betsVisible || chosenBet !== null) {
@@ -169,6 +219,30 @@ export function VideoSlide({
         <div className="video-feed__shade" aria-hidden />
 
         <div className={`video-slide__bets${betsVisible ? " video-slide__bets--visible" : ""}`}>
+          {showLevelSpinEntry ? (
+            <button
+              type="button"
+              className="video-slide__level-spin-trigger"
+              onClick={onOpenLevelSpin}
+              aria-label="Open level spin wheel"
+            >
+              <span className="video-slide__level-spin-badge">
+                {availableLevelSpins}
+              </span>
+              <span className="video-slide__level-spin-icon" aria-hidden>
+                {wheelAnimData ? (
+                  <Lottie
+                    key={wheelAnimRun}
+                    animationData={wheelAnimData}
+                    loop={false}
+                    autoplay
+                  />
+                ) : (
+                  "🎡"
+                )}
+              </span>
+            </button>
+          ) : null}
           <div
             className={`video-slide__bets-row${chosenBet ? " video-slide__bets-row--single" : ""}${betButtonExit ? " video-slide__bets-row--exit" : ""}`}
           >

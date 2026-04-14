@@ -8,9 +8,13 @@ import { FortuneWheelSlide } from "./FortuneWheelSlide";
 import "./VideoFeed.css";
 
 /**
- * @param {{ items: Array<{ type: string, id: string, src?: string, feedSlot?: number, creativeId?: string }> }} props
+ * @param {{
+ *  items: Array<{ type: string, id: string, src?: string, feedSlot?: number, creativeId?: string }>,
+ *  availableLevelSpins?: number,
+ *  onOpenLevelSpin?: () => void
+ * }} props
  */
-export function VideoFeed({ items }) {
+export function VideoFeed({ items, availableLevelSpins = 0, onOpenLevelSpin }) {
   const feedRef = useRef(null);
   const { setActiveFeedItemKey, dailyBonusOpen } = useOffers();
   const [activeKey, setActiveKey] = useState(null);
@@ -208,6 +212,8 @@ export function VideoFeed({ items }) {
             id={item.id}
             src={item.src ?? ""}
             isActive={activeKey === `video:${item.id}`}
+            availableLevelSpins={availableLevelSpins}
+            onOpenLevelSpin={onOpenLevelSpin}
             teaseSwipeActive={
               swipeTeasePulse &&
               swipeTeaseVideoId === item.id &&

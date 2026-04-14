@@ -17,6 +17,52 @@
   transform: translateY(0);
 }
 
+.video-slide__level-spin-trigger {
+  position: absolute;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: calc(86px + env(safe-area-inset-bottom, 0px));
+  width: 66px;
+  height: 66px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  overflow: visible;
+  cursor: pointer;
+}
+
+.video-slide__level-spin-icon {
+  width: 82px;
+  height: 82px;
+  display: grid;
+  place-items: center;
+}
+
+.video-slide__level-spin-icon > * {
+  width: 100%;
+  height: 100%;
+}
+
+.video-slide__level-spin-badge {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  padding: 0 3px;
+  background: #caed04e1;
+  color: #2c2c2c;
+  font-size: 12px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .video-slide__bets-row {
   pointer-events: auto;
   display: flex;
