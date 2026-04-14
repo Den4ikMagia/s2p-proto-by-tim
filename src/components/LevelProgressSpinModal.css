@@ -1,207 +1,261 @@
 .level-spin {
-  position: relative;
-  height: 100%;
-  min-height: 100%;
-}
-
-.level-spin__sheet {
-  position: relative;
-  height: 100%;
-  min-height: 100%;
-  border-radius: 0;
-  background: #0c0d12;
-  border: none;
-  padding: calc(54px + env(safe-area-inset-top)) 12px
-    max(12px, calc(env(safe-area-inset-bottom) + 12px));
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  overflow: auto;
-}
-
-.level-spin__top {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.level-spin__arena {
-  position: relative;
-  border-radius: 14px;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  z-index: 2;
+  /* На всю ширину контейнера минус 8px с каждой стороны */
+  --wheel-size: min(calc(100% - 16px), 420px);
+  --wheel-half: calc(var(--wheel-size) / 2);
+  /* Центр колеса выше нижнего края — кнопка GO целиком в кадре */
+  --wheel-lift-y: 28%;
+  /* Область видимости: чуть выше половины диаметра — хаб не клипится */
+  --wheel-mask-height: min(calc(var(--wheel-size) * 0.62), 52vh);
   overflow: hidden;
-  height: 180px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .level-spin__video {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  z-index: 0;
 }
 
 .level-spin__shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.75));
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.15) 0%,
+    rgba(0, 0, 0, 0.05) 35%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
 }
 
-.level-spin__progress-wrap {
+/* Вертикальный прогресс уровня — справа */
+.level-spin__v-progress {
   position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-}
-
-.level-spin__progress-head {
+  z-index: 3;
+  top: calc(52px + env(safe-area-inset-top, 0px));
+  right: max(10px, env(safe-area-inset-right));
+  bottom: calc(var(--wheel-mask-height) + 20px);
+  width: 44px;
   display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  margin-bottom: 6px;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
 }
 
-.level-spin__track {
-  height: 14px;
+.level-spin__v-progress-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  line-height: 1.15;
+  max-width: 44px;
+}
+
+.level-spin__v-progress-track {
+  flex: 1;
+  width: 14px;
+  min-height: 80px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.2);
-  overflow: visible;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
+  overflow: hidden;
 }
 
-.level-spin__track-fill {
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #34d399, #22c55e);
-  transition: width 0.45s ease;
-}
-
-.level-spin__horse {
+.level-spin__v-progress-fill {
   position: absolute;
-  top: -21px;
-  transition: left 0.45s ease;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, #fde047, #eab308);
+  transition: height 0.45s ease;
 }
 
-.level-spin__wheel-zone {
-  position: relative;
-  width: 260px;
-  height: 260px;
-  margin: 0 auto;
+.level-spin__v-progress-foot {
+  font-size: 10px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Колесо: нижняя часть за экраном; маска с отступами 8px по бокам */
+.level-spin__wheel-mask {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: -30px;
+  width: auto;
+  height: var(--wheel-mask-height);
+  z-index: 4;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.level-spin__wheel-mask .level-spin__wheel-stack,
+.level-spin__wheel-mask .level-spin__wheel-rot,
+.level-spin__wheel-mask .level-spin__hub {
+  pointer-events: auto;
 }
 
 .level-spin__pointer {
   position: absolute;
   left: 50%;
-  top: -2px;
+  top: 0;
   transform: translateX(-50%);
-  z-index: 3;
-  color: #f97316;
+  z-index: 6;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
 }
 
-.level-spin__wheel {
+/* Квадрат колеса + хаб: общий центр, подъём вместе */
+.level-spin__wheel-stack {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: var(--wheel-size);
+  height: 0;
+  padding-bottom: 100%;
+  margin: 0 auto;
+  transform: translateY(var(--wheel-lift-y));
+  z-index: 4;
+}
+
+.level-spin__wheel-rot {
   position: absolute;
   inset: 0;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.18);
-  background: #161823;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 50%;
+  z-index: 2;
   transition-property: transform;
-  transition-duration: 2500ms;
   transition-timing-function: cubic-bezier(0.12, 0.82, 0.18, 1);
 }
 
-.level-spin__segment {
-  --seg: calc(360deg / var(--total));
-  position: absolute;
-  width: 50%;
-  height: 2px;
-  left: 50%;
-  top: 50%;
-  transform-origin: 0 0;
-  transform: rotate(calc(var(--idx) * var(--seg)));
-}
-
-.level-spin__segment span {
-  position: absolute;
-  left: 76px;
-  top: -7px;
-  font-size: 11px;
-  font-weight: 800;
-  color: #8bffcd;
-}
-
-.level-spin__segment::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: -1px;
-  width: 128px;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.level-spin__segment--zero span {
-  color: #fda4af;
+.level-spin__wheel-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .level-spin__hub {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 24px;
-  height: 24px;
-  margin-left: -12px;
-  margin-top: -12px;
+  z-index: 5;
+  width: max-content;
+  max-width: 92%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: auto;
+}
+
+.level-spin__hub-coins {
+  font-size: 12px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: #fde047;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.level-spin__go {
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
-  background: #fff;
+  border: 3px solid #fbbf24;
+  background: linear-gradient(180deg, #fb923c 0%, #ea580c 100%);
+  color: #fffbeb;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  font-family: inherit;
+}
+
+.level-spin__go:disabled {
+  opacity: 0.85;
+  cursor: wait;
+}
+
+.level-spin__hub-hint {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.75);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .level-spin__multis {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: calc(var(--wheel-mask-height) + 10px);
+  transform: translateX(-50%);
   display: flex;
-  justify-content: center;
   gap: 8px;
 }
 
 .level-spin__multi {
-  min-width: 52px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: transparent;
+  min-width: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.35);
   color: #fff;
   border-radius: 999px;
-  padding: 7px 10px;
-  font-weight: 700;
+  padding: 6px 10px;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
 }
 
 .level-spin__multi--active {
   border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.18);
-}
-
-.level-spin__go {
-  border: none;
-  border-radius: 999px;
-  background: #f59e0b;
-  color: #130d00;
-  font-size: 15px;
-  font-weight: 900;
-  padding: 14px 16px;
+  background: rgba(34, 197, 94, 0.35);
 }
 
 .level-spin__state {
+  position: absolute;
+  z-index: 7;
+  left: 50%;
+  bottom: calc(var(--wheel-mask-height) + 48px);
+  transform: translateX(-50%);
   text-align: center;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
 }
 
 .level-spin__state--complete {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
+  align-items: center;
+  pointer-events: auto;
 }
 
 .level-spin__state--complete button {
-  justify-self: center;
   border: none;
   border-radius: 999px;
-  padding: 9px 14px;
+  padding: 10px 18px;
   background: #22c55e;
-  color: #07200f;
+  color: #052500;
   font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
 }
