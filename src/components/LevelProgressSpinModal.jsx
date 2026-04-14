@@ -16,6 +16,18 @@ const LEVEL_SPIN_SFX_BASE = "koleso-fortunyi--ostanavlivaetsya";
 const LEVEL_SPIN_POINTER_SRC =
   "https://battleme.club/assets/arrow-CscS0JHK.png";
 
+/** Время на таймлайне ролика под текущий прогресс (у многих MP4 t=0 чёрный — для 0 шагов слегка сдвигаем) */
+function getVideoTimeForProgress(progressSteps, duration) {
+  const max = LEVEL_SPIN_CONFIG.QtyLevelSteps;
+  if (!Number.isFinite(duration) || duration <= 0 || max <= 0) return 0;
+  if (progressSteps >= max) return Math.max(0, duration - 1e-3);
+  if (progressSteps <= 0) return Math.min(1 / 24, duration * 0.01);
+  return Math.min(
+    Math.max((progressSteps / max) * duration, 0),
+    duration - 1e-3
+  );
+}
+
 /**
  * @param {number} cx
  * @param {number} cy
@@ -55,33 +67,46 @@ export function LevelProgressSpinModal({
     /** @type {null | { result: number; cost: number }} */ (null)
   );
   const videoRef = useRef(/** @type {HTMLVideoElement | null} */ (null));
+  const videoDurationRef = useRef(0);
+  const progressRef = useRef(0);
+  const videoSegmentCleanupRef = useRef(() => {});
+
+  const maxSteps = LEVEL_SPIN_CONFIG.QtyLevelSteps;
 
   useEffect(() => {
     preloadSfxBases([LEVEL_SPIN_SFX_BASE]);
   }, []);
 
-  /** Автовоспроизведение + соседние transform могут гасить декод в WebKit — держим play() явно */
+  useEffect(() => {
+    progressRef.current = progress;
+  }, [progress]);
+
+  /** Старт: пауза; кадр по прогрессу после metadata + декод первого кадра (loadeddata) */
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
-    const tryPlay = () => {
-      void el.play().catch(() => {});
+    const syncFrameToProgress = () => {
+      const dur = videoDurationRef.current;
+      if (!dur) return;
+      el.pause();
+      el.currentTime = getVideoTimeForProgress(progressRef.current, dur);
     };
-    tryPlay();
-    el.addEventListener("loadeddata", tryPlay);
-    el.addEventListener("canplay", tryPlay);
-    const onVis = () => {
-      if (document.visibilityState === "visible") tryPlay();
+    const onMeta = () => {
+      videoDurationRef.current = Number.isFinite(el.duration) ? el.duration : 0;
+      syncFrameToProgress();
     };
-    document.addEventListener("visibilitychange", onVis);
+    const onLoadedData = () => {
+      syncFrameToProgress();
+    };
+    el.addEventListener("loadedmetadata", onMeta);
+    el.addEventListener("loadeddata", onLoadedData);
+    if (el.readyState >= 1) onMeta();
+    if (el.readyState >= 2) onLoadedData();
     return () => {
-      el.removeEventListener("loadeddata", tryPlay);
-      el.removeEventListener("canplay", tryPlay);
-      document.removeEventListener("visibilitychange", onVis);
+      el.removeEventListener("loadedmetadata", onMeta);
+      el.removeEventListener("loadeddata", onLoadedData);
     };
-  }, []);
-
-  const maxSteps = LEVEL_SPIN_CONFIG.QtyLevelSteps;
+  }, [maxSteps]);
   const spinCost = LEVEL_SPIN_CONFIG.SpinCost * multiplier;
   const stepValues = useMemo(
     () => LEVEL_SPIN_CONFIG.step_values.map((v) => v * multiplier),
@@ -133,13 +158,55 @@ export function LevelProgressSpinModal({
     return paths;
   }, [wheelSegments]);
 
+  /** Проиграть кусок видео: длительность = duration * (result / QtyLevelSteps), от текущего шага к следующему */
+  const playVideoSegmentForSteps = useCallback(
+    (prevProgress, result) => {
+      const video = videoRef.current;
+      const dur = videoDurationRef.current;
+      if (!video || !dur || result <= 0) return;
+
+      videoSegmentCleanupRef.current();
+      video.pause();
+
+      const t0 = (prevProgress / maxSteps) * dur;
+      const nextProgress = Math.min(maxSteps, prevProgress + result);
+      const t1 = Math.min(dur, (nextProgress / maxSteps) * dur);
+
+      if (t1 <= t0 + 1e-3) return;
+
+      video.currentTime = t0;
+
+      const onTimeUpdate = () => {
+        if (video.currentTime >= t1 - 0.05 || video.ended) {
+          video.pause();
+          video.currentTime = Math.min(t1, dur);
+          video.removeEventListener("timeupdate", onTimeUpdate);
+          videoSegmentCleanupRef.current = () => {};
+        }
+      };
+      video.addEventListener("timeupdate", onTimeUpdate);
+      videoSegmentCleanupRef.current = () => {
+        video.removeEventListener("timeupdate", onTimeUpdate);
+      };
+
+      void video.play().catch(() => {});
+    },
+    [maxSteps]
+  );
+
+  useEffect(() => {
+    return () => videoSegmentCleanupRef.current();
+  }, []);
+
   const applySpinResult = useCallback(
     (result, cost) => {
+      const prevProgress = progressRef.current;
       setLastResult(result);
       if (result === 0) {
         setStatus("result");
         return;
       }
+      playVideoSegmentForSteps(prevProgress, result);
       setProgress((prev) => {
         const next = prev + result;
         if (next >= maxSteps) {
@@ -155,7 +222,7 @@ export function LevelProgressSpinModal({
         return next;
       });
     },
-    [maxSteps, onRefundCoins]
+    [maxSteps, onRefundCoins, playVideoSegmentForSteps]
   );
 
   const handleTransitionEnd = useCallback(
@@ -181,6 +248,9 @@ export function LevelProgressSpinModal({
     setLastResult(0);
     setLastRefund(0);
 
+    videoSegmentCleanupRef.current();
+    videoRef.current?.pause();
+
     const segmentIndex = Math.floor(Math.random() * wheelSegments.length);
     const result = wheelSegments[segmentIndex] ?? 0;
     const segDeg = 360 / SEGMENTS_TOTAL;
@@ -200,6 +270,13 @@ export function LevelProgressSpinModal({
   }
 
   function handleNextLevel() {
+    videoSegmentCleanupRef.current();
+    const v = videoRef.current;
+    if (v) {
+      v.pause();
+      v.currentTime = 0;
+    }
+    progressRef.current = 0;
     setLevel((l) => l + 1);
     setProgress(0);
     setLastResult(0);
@@ -215,9 +292,7 @@ export function LevelProgressSpinModal({
         ref={videoRef}
         className="level-spin__video"
         src={LEVEL_SPIN_CONFIG.video_url}
-        autoPlay
         muted
-        loop
         playsInline
         preload="auto"
       />
