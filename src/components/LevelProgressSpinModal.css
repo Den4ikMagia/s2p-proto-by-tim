@@ -1,0 +1,207 @@
+.level-spin {
+  position: relative;
+  height: 100%;
+  min-height: 100%;
+}
+
+.level-spin__sheet {
+  position: relative;
+  height: 100%;
+  min-height: 100%;
+  border-radius: 0;
+  background: #0c0d12;
+  border: none;
+  padding: calc(54px + env(safe-area-inset-top)) 12px
+    max(12px, calc(env(safe-area-inset-bottom) + 12px));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+}
+
+.level-spin__top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.level-spin__arena {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  height: 180px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.level-spin__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.level-spin__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.75));
+}
+
+.level-spin__progress-wrap {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+}
+
+.level-spin__progress-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.level-spin__track {
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  overflow: visible;
+  position: relative;
+}
+
+.level-spin__track-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #34d399, #22c55e);
+  transition: width 0.45s ease;
+}
+
+.level-spin__horse {
+  position: absolute;
+  top: -21px;
+  transition: left 0.45s ease;
+}
+
+.level-spin__wheel-zone {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  margin: 0 auto;
+}
+
+.level-spin__pointer {
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  transform: translateX(-50%);
+  z-index: 3;
+  color: #f97316;
+}
+
+.level-spin__wheel {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  background: #161823;
+  transition-property: transform;
+  transition-duration: 2500ms;
+  transition-timing-function: cubic-bezier(0.12, 0.82, 0.18, 1);
+}
+
+.level-spin__segment {
+  --seg: calc(360deg / var(--total));
+  position: absolute;
+  width: 50%;
+  height: 2px;
+  left: 50%;
+  top: 50%;
+  transform-origin: 0 0;
+  transform: rotate(calc(var(--idx) * var(--seg)));
+}
+
+.level-spin__segment span {
+  position: absolute;
+  left: 76px;
+  top: -7px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #8bffcd;
+}
+
+.level-spin__segment::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 128px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.level-spin__segment--zero span {
+  color: #fda4af;
+}
+
+.level-spin__hub {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  margin-left: -12px;
+  margin-top: -12px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.level-spin__multis {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.level-spin__multi {
+  min-width: 52px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: transparent;
+  color: #fff;
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-weight: 700;
+}
+
+.level-spin__multi--active {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.18);
+}
+
+.level-spin__go {
+  border: none;
+  border-radius: 999px;
+  background: #f59e0b;
+  color: #130d00;
+  font-size: 15px;
+  font-weight: 900;
+  padding: 14px 16px;
+}
+
+.level-spin__state {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.level-spin__state--complete {
+  display: grid;
+  gap: 8px;
+}
+
+.level-spin__state--complete button {
+  justify-self: center;
+  border: none;
+  border-radius: 999px;
+  padding: 9px 14px;
+  background: #22c55e;
+  color: #07200f;
+  font-weight: 800;
+}

@@ -5,6 +5,8 @@ import { CoinWinFlyover } from "./components/CoinWinFlyover";
 import { LoseFeedbackOverlay } from "./components/LoseFeedbackOverlay";
 import { DailyBonusModal } from "./components/DailyBonusModal";
 import { FortuneWheelOfferModal } from "./components/FortuneWheelOfferModal";
+import { LevelProgressSpinModal } from "./components/LevelProgressSpinModal";
+import { LEVEL_SPIN_CONFIG } from "./data/levelSpinMock";
 import { VideoFeed } from "./components/VideoFeed";
 import { OFFER_CARDS_MOCK } from "./data/offerCardsMock";
 import StoreIcon from "mdi-react/StoreIcon";
@@ -15,6 +17,7 @@ import VolumeHighIcon from "mdi-react/VolumeHighIcon";
 import VibrationIcon from "mdi-react/VibrationIcon";
 import FlashIcon from "mdi-react/FlashIcon";
 import EmailOutlineIcon from "mdi-react/EmailOutlineIcon";
+import KeyboardBackspaceIcon from "mdi-react/KeyboardBackspaceIcon";
 import {
   PROTOTYPE_VIDEOS,
   buildFeedItems,
@@ -283,6 +286,7 @@ function AppShell() {
   const {
     energy,
     coins,
+    setCoins,
     openShop,
     activeFeedItemKey,
     coinWinFx,
@@ -315,6 +319,7 @@ function AppShell() {
   const [coinBalancePulse, setCoinBalancePulse] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [bonusesOpen, setBonusesOpen] = useState(false);
+  const [levelSpinOpen, setLevelSpinOpen] = useState(false);
 
   const handleCoinsFlyStart = useCallback(() => {
     setCoinBalancePulse(true);
@@ -331,17 +336,48 @@ function AppShell() {
     <div
       className={`app-shell${isSponsoredVideoActive ? " app-shell--sponsored-video-active" : ""}`}
     >
-      <VideoFeed items={items} />
+      {levelSpinOpen ? (
+        <LevelProgressSpinModal
+          coins={coins}
+          energy={energy}
+          onSpendCoins={(amount) => setCoins((c) => Math.max(0, c - amount))}
+          onRefundCoins={(amount) => setCoins((c) => c + amount)}
+        />
+      ) : (
+        <>
+          <VideoFeed items={items} />
+          <button
+            type="button"
+            className="app-shell__level-spin-entry"
+            onClick={() => setLevelSpinOpen(true)}
+          >
+            <span>🎡 Level Spin</span>
+            <small>
+              spins: {Math.floor(coins / LEVEL_SPIN_CONFIG.SpinCost)}
+            </small>
+          </button>
+        </>
+      )}
 
       <header className="app-shell__hud app-shell__hud--top">
         <div className="app-shell__topbar">
           <button
             type="button"
             className="app-shell__menu"
-            aria-label="Меню"
-            onClick={() => setDrawerOpen(true)}
+            aria-label={levelSpinOpen ? "Back" : "Меню"}
+            onClick={() => {
+              if (levelSpinOpen) {
+                setLevelSpinOpen(false);
+                return;
+              }
+              setDrawerOpen(true);
+            }}
           >
-            <span className="app-shell__menu-lines" />
+            {levelSpinOpen ? (
+              <KeyboardBackspaceIcon size={18} aria-hidden />
+            ) : (
+              <span className="app-shell__menu-lines" />
+            )}
           </button>
           <div className="app-shell__energy-pill">
             <span className="app-shell__energy-inner">
@@ -398,7 +434,6 @@ function AppShell() {
         formatNum={formatNum}
       />
       <BonusOfferListModal open={bonusesOpen} onClose={() => setBonusesOpen(false)} />
-
       {coinWinFx ? (
         <CoinWinFlyover
           amount={coinWinFx.amount}
