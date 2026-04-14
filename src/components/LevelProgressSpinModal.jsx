@@ -54,9 +54,31 @@ export function LevelProgressSpinModal({
   const pendingSpinRef = useRef(
     /** @type {null | { result: number; cost: number }} */ (null)
   );
+  const videoRef = useRef(/** @type {HTMLVideoElement | null} */ (null));
 
   useEffect(() => {
     preloadSfxBases([LEVEL_SPIN_SFX_BASE]);
+  }, []);
+
+  /** Автовоспроизведение + соседние transform могут гасить декод в WebKit — держим play() явно */
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    const tryPlay = () => {
+      void el.play().catch(() => {});
+    };
+    tryPlay();
+    el.addEventListener("loadeddata", tryPlay);
+    el.addEventListener("canplay", tryPlay);
+    const onVis = () => {
+      if (document.visibilityState === "visible") tryPlay();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      el.removeEventListener("loadeddata", tryPlay);
+      el.removeEventListener("canplay", tryPlay);
+      document.removeEventListener("visibilitychange", onVis);
+    };
   }, []);
 
   const maxSteps = LEVEL_SPIN_CONFIG.QtyLevelSteps;
@@ -190,12 +212,14 @@ export function LevelProgressSpinModal({
   return (
     <section className="level-spin" data-feed-item data-feed-type="level_spin">
       <video
+        ref={videoRef}
         className="level-spin__video"
         src={LEVEL_SPIN_CONFIG.video_url}
         autoPlay
         muted
         loop
         playsInline
+        preload="auto"
       />
       <div className="level-spin__shade" aria-hidden />
 
