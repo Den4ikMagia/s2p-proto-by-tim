@@ -1,9 +1,20 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  playSfxBase,
+  preloadSfxBases,
+  primeSfxFromUserGesture,
+} from "../audio/sfx";
 import { LEVEL_SPIN_CONFIG } from "../data/levelSpinMock";
 import "./LevelProgressSpinModal.css";
 
 const MULTIPLIERS = [1, 2, 5];
 const SEGMENTS_TOTAL = 16;
+
+/** Как в FortuneWheelSlide — длина 4s под анимацию */
+const LEVEL_SPIN_SFX_BASE = "koleso-fortunyi--ostanavlivaetsya";
+
+const LEVEL_SPIN_POINTER_SRC =
+  "https://battleme.club/assets/arrow-CscS0JHK.png";
 
 /**
  * @param {number} cx
@@ -35,12 +46,18 @@ export function LevelProgressSpinModal({
   const [progress, setProgress] = useState(0);
   const [multiplier, setMultiplier] = useState(1);
   const [rotation, setRotation] = useState(0);
-  const [spinDurationMs, setSpinDurationMs] = useState(2500);
   const [status, setStatus] = useState(
     /** @type {"idle" | "spinning" | "result" | "level_complete"} */ ("idle")
   );
   const [lastResult, setLastResult] = useState(0);
   const [lastRefund, setLastRefund] = useState(0);
+  const pendingSpinRef = useRef(
+    /** @type {null | { result: number; cost: number }} */ (null)
+  );
+
+  useEffect(() => {
+    preloadSfxBases([LEVEL_SPIN_SFX_BASE]);
+  }, []);
 
   const maxSteps = LEVEL_SPIN_CONFIG.QtyLevelSteps;
   const spinCost = LEVEL_SPIN_CONFIG.SpinCost * multiplier;
@@ -94,6 +111,43 @@ export function LevelProgressSpinModal({
     return paths;
   }, [wheelSegments]);
 
+  const applySpinResult = useCallback(
+    (result, cost) => {
+      setLastResult(result);
+      if (result === 0) {
+        setStatus("result");
+        return;
+      }
+      setProgress((prev) => {
+        const next = prev + result;
+        if (next >= maxSteps) {
+          const overflow = next - maxSteps;
+          const refund = cost * (overflow / result);
+          const roundedRefund = Math.max(0, Math.round(refund));
+          if (roundedRefund > 0) onRefundCoins(roundedRefund);
+          setLastRefund(roundedRefund);
+          setStatus("level_complete");
+          return maxSteps;
+        }
+        setStatus("result");
+        return next;
+      });
+    },
+    [maxSteps, onRefundCoins]
+  );
+
+  const handleTransitionEnd = useCallback(
+    (e) => {
+      if (e.propertyName !== "transform") return;
+      if (status !== "spinning") return;
+      const pending = pendingSpinRef.current;
+      pendingSpinRef.current = null;
+      if (!pending) return;
+      applySpinResult(pending.result, pending.cost);
+    },
+    [status, applySpinResult]
+  );
+
   function handleSpin() {
     if (status === "spinning") return;
     if (coins < spinCost) {
@@ -102,7 +156,6 @@ export function LevelProgressSpinModal({
     }
 
     onSpendCoins(spinCost);
-    setStatus("spinning");
     setLastResult(0);
     setLastRefund(0);
 
@@ -111,31 +164,17 @@ export function LevelProgressSpinModal({
     const segDeg = 360 / SEGMENTS_TOTAL;
     const spins = 5 + Math.floor(Math.random() * 3);
     const offset = 360 - (segmentIndex * segDeg + segDeg / 2);
-    const duration = 2200 + Math.floor(Math.random() * 900);
-    setSpinDurationMs(duration);
-    setRotation((r) => r + spins * 360 + offset);
 
-    window.setTimeout(() => {
-      setLastResult(result);
-      if (result === 0) {
-        setStatus("result");
-        return;
-      }
+    pendingSpinRef.current = { result, cost: spinCost };
+    primeSfxFromUserGesture();
+    void playSfxBase(LEVEL_SPIN_SFX_BASE, 0.88);
+    setStatus("spinning");
 
-      const nextProgress = progress + result;
-      if (nextProgress >= maxSteps) {
-        const overflow = nextProgress - maxSteps;
-        const refund = spinCost * (overflow / result);
-        const roundedRefund = Math.max(0, Math.round(refund));
-        if (roundedRefund > 0) onRefundCoins(roundedRefund);
-        setProgress(maxSteps);
-        setLastRefund(roundedRefund);
-        setStatus("level_complete");
-      } else {
-        setProgress(nextProgress);
-        setStatus("result");
-      }
-    }, duration + 40);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setRotation((r) => r + spins * 360 + offset);
+      });
+    });
   }
 
   function handleNextLevel() {
@@ -175,22 +214,20 @@ export function LevelProgressSpinModal({
 
       <div className="level-spin__wheel-mask">
         <div className="level-spin__pointer" aria-hidden>
-          <svg width="36" height="28" viewBox="0 0 36 28">
-            <path
-              d="M18 0 L36 28 L0 28 Z"
-              fill="#a855f7"
-              stroke="#fbbf24"
-              strokeWidth="2"
-            />
-          </svg>
+          <img
+            className="level-spin__pointer-img"
+            src={LEVEL_SPIN_POINTER_SRC}
+            alt=""
+            width={72}
+            height={72}
+            draggable={false}
+          />
         </div>
         <div className="level-spin__wheel-stack">
           <div
-            className="level-spin__wheel-rot"
-            style={{
-              transform: `rotate(${rotation}deg)`,
-              transitionDuration: `${spinDurationMs}ms`,
-            }}
+            className={`level-spin__wheel-rot${status === "spinning" ? " level-spin__wheel-rot--animating" : ""}`}
+            style={{ transform: `rotate(${rotation}deg)` }}
+            onTransitionEnd={handleTransitionEnd}
           >
             <svg
               className="level-spin__wheel-svg"

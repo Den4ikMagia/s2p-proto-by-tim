@@ -92,14 +92,16 @@
 /* Колесо: нижняя часть за экраном; маска с отступами 8px по бокам */
 .level-spin__wheel-mask {
   position: absolute;
-  left: 8px;
-  right: 8px;
-  bottom: -30px;
+  left: 5px;
+  right: 5px;
+  bottom: 0;
   width: auto;
   height: var(--wheel-mask-height);
   z-index: 4;
   overflow: hidden;
   pointer-events: none;
+  /* Весь блок колеса + указатель ниже на 20px */
+  transform: translateY(30px);
 }
 
 .level-spin__wheel-mask .level-spin__wheel-stack,
@@ -108,13 +110,23 @@
   pointer-events: auto;
 }
 
+/* Как fortune-wheel-slide__pointer: остриё к секторам сверху */
 .level-spin__pointer {
   position: absolute;
   left: 50%;
-  top: 0;
-  transform: translateX(-50%);
+  top: -10px;
   z-index: 6;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+  pointer-events: none;
+  transform: translate(-50%, 18%);
+}
+
+.level-spin__pointer-img {
+  display: block;
+  width: min(36px, 17vw);
+  height: auto;
+  max-height: min(88px, 20vw);
+  object-fit: contain;
+  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.5));
 }
 
 /* Квадрат колеса + хаб: общий центр, подъём вместе */
@@ -139,8 +151,13 @@
   height: 100%;
   transform-origin: 50% 50%;
   z-index: 2;
-  transition-property: transform;
-  transition-timing-function: cubic-bezier(0.12, 0.82, 0.18, 1);
+  transition: none;
+}
+
+/* Как fortune-wheel-slide__svg--animating: 4s под koleso-fortunyi--ostanavlivaetsya.mp3 */
+.level-spin__wheel-rot--animating {
+  transition: transform 4s cubic-bezier(0.12, 0.82, 0.18, 1);
+  will-change: transform;
 }
 
 .level-spin__wheel-svg {
