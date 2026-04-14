@@ -41,6 +41,16 @@ function polar(cx, cy, r, deg) {
 }
 
 /**
+ * Угол rotate() (mod 360), при котором центр сегмента segmentIndex оказывается под указателем (12ч).
+ * Сегменты как в SVG: i-й от -90° + i*segDeg. Учёт накопленного rotation — отдельно через delta.
+ */
+function rotationModForSegmentCenter(segmentIndex, segDeg) {
+  const mid = -90 + segmentIndex * segDeg + segDeg / 2;
+  const target = -90 - mid;
+  return ((target % 360) + 360) % 360;
+}
+
+/**
  * @param {{
  *  coins: number,
  *  energy: number,
@@ -255,7 +265,7 @@ export function LevelProgressSpinModal({
     const result = wheelSegments[segmentIndex] ?? 0;
     const segDeg = 360 / SEGMENTS_TOTAL;
     const spins = 5 + Math.floor(Math.random() * 3);
-    const offset = 360 - (segmentIndex * segDeg + segDeg / 2);
+    const targetRMod = rotationModForSegmentCenter(segmentIndex, segDeg);
 
     pendingSpinRef.current = { result, cost: spinCost };
     primeSfxFromUserGesture();
@@ -264,7 +274,11 @@ export function LevelProgressSpinModal({
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        setRotation((r) => r + spins * 360 + offset);
+        setRotation((r) => {
+          const prevMod = ((r % 360) + 360) % 360;
+          const deltaMod = (targetRMod - prevMod + 360) % 360;
+          return r + spins * 360 + deltaMod;
+        });
       });
     });
   }
