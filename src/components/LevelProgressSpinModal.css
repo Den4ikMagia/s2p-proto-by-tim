@@ -279,3 +279,32 @@
   cursor: pointer;
   font-family: inherit;
 }
+
+.level-spin__complete-box {
+  width: min(104px, 28vw);
+  max-height: 116px;
+}
+
+.level-spin__complete-energy {
+  width: min(82px, 24vw);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+.level-spin__complete-refund {
+  margin: -2px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.84);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.level-spin__inline-icon {
+  display: inline-block;
+  width: 1.05em;
+  height: 1.05em;
+  vertical-align: -0.15em;
+  object-fit: contain;
+}

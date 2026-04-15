@@ -24,6 +24,10 @@
   opacity: 0.92;
 }
 
+.coin-win-fx__cluster--coinsFly-energy {
+  transform: translate(-50%, -50%) translate(0, -298px) scale(0.32);
+}
+
 .coin-win-fx__coin {
   position: absolute;
   left: 0;
@@ -67,6 +71,13 @@
   white-space: nowrap;
   transform: translate(-50%, -50%);
   animation: coin-win-badge-in 0.38s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+
+.coin-win-fx__badge--energy {
+  background: linear-gradient(180deg, #00c3fd 47.22%, #007ad9 100%);
+  box-shadow:
+    0 8px 32px rgba(0, 122, 217, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .coin-win-fx__badge--exit {

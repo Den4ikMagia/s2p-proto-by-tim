@@ -81,6 +81,11 @@
   font-variant-numeric: tabular-nums;
 }
 
+.app-shell__energy-text-val {
+  display: inline-block;
+  transform-origin: center center;
+}
+
 .app-shell__energy-icon {
   display: inline-flex;
   align-items: center;
@@ -168,6 +173,10 @@
 }
 
 .app-shell__coins-val--pulse {
+  animation: app-shell-coins-val-pulse 0.42s cubic-bezier(0.45, 0, 0.25, 1.2) both;
+}
+
+.app-shell__energy-text-val--pulse {
   animation: app-shell-coins-val-pulse 0.42s cubic-bezier(0.45, 0, 0.25, 1.2) both;
 }
 

@@ -285,6 +285,7 @@ function BurgerDrawer({
 function AppShell() {
   const {
     energy,
+    setEnergy,
     coins,
     setCoins,
     openShop,
@@ -317,6 +318,7 @@ function AppShell() {
   );
 
   const [coinBalancePulse, setCoinBalancePulse] = useState(false);
+  const [energyBalancePulse, setEnergyBalancePulse] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [bonusesOpen, setBonusesOpen] = useState(false);
   const [levelSpinOpen, setLevelSpinOpen] = useState(false);
@@ -324,6 +326,11 @@ function AppShell() {
   const handleCoinsFlyStart = useCallback(() => {
     setCoinBalancePulse(true);
     window.setTimeout(() => setCoinBalancePulse(false), 480);
+  }, []);
+
+  const handleEnergyFlyStart = useCallback(() => {
+    setEnergyBalancePulse(true);
+    window.setTimeout(() => setEnergyBalancePulse(false), 480);
   }, []);
 
   function formatNum(n) {
@@ -342,6 +349,8 @@ function AppShell() {
           energy={energy}
           onSpendCoins={(amount) => setCoins((c) => Math.max(0, c - amount))}
           onRefundCoins={(amount) => setCoins((c) => c + amount)}
+          onGrantEnergy={(amount) => setEnergy((e) => e + amount)}
+          onEnergyFlyStart={handleEnergyFlyStart}
         />
       ) : (
         <>
@@ -376,7 +385,13 @@ function AppShell() {
           <div className="app-shell__energy-pill">
             <span className="app-shell__energy-inner">
               <span className="app-shell__energy-text">
-                {energy}/{MAX_ENERGY_DISPLAY}
+                <span
+                  className={`app-shell__energy-text-val${
+                    energyBalancePulse ? " app-shell__energy-text-val--pulse" : ""
+                  }`}
+                >
+                  {energy}/{MAX_ENERGY_DISPLAY}
+                </span>
               </span>
               <span className="app-shell__energy-icon" aria-hidden>
                 <FlashIcon size={14} />

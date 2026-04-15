@@ -4,7 +4,10 @@ import {
   preloadSfxBases,
   primeSfxFromUserGesture,
 } from "../audio/sfx";
+import { CoinWinFlyover } from "./CoinWinFlyover";
 import { LEVEL_SPIN_CONFIG } from "../data/levelSpinMock";
+import { publicUrl } from "../publicUrl";
+import "./DailyBonusModal.css";
 import "./LevelProgressSpinModal.css";
 
 const MULTIPLIERS = [1, 2, 5];
@@ -15,6 +18,21 @@ const LEVEL_SPIN_SFX_BASE = "koleso-fortunyi--ostanavlivaetsya";
 
 const LEVEL_SPIN_POINTER_SRC =
   "https://battleme.club/assets/arrow-CscS0JHK.png";
+const LEVEL_BOX_IMG = publicUrl("level-box.png");
+const ENERGY_IMG = publicUrl("energy.png");
+const ENERGY_ICON_IMG = publicUrl("energy-icon.png");
+const COIN_ICON_IMG = publicUrl("coin-fly.png");
+const RAYS_1 = publicUrl("daily-bonus-rays-1.png");
+const RAYS_2 = publicUrl("daily-bonus-rays-2.png");
+const LEVEL_COMPLETE_ENERGY_REWARD = 60;
+const CONFETTI_COLORS = [
+  "#22c55e",
+  "#ef4444",
+  "#eab308",
+  "#3b82f6",
+  "#a855f7",
+  "#f97316",
+];
 
 /** Время на таймлайне ролика под текущий прогресс (у многих MP4 t=0 чёрный — для 0 шагов слегка сдвигаем) */
 function getVideoTimeForProgress(progressSteps, duration) {
@@ -55,7 +73,9 @@ function rotationModForSegmentCenter(segmentIndex, segDeg) {
  *  coins: number,
  *  energy: number,
  *  onSpendCoins: (amount: number) => void,
- *  onRefundCoins: (amount: number) => void
+ *  onRefundCoins: (amount: number) => void,
+ *  onGrantEnergy?: (amount: number) => void,
+ *  onEnergyFlyStart?: () => void
  * }} props
  */
 export function LevelProgressSpinModal({
@@ -63,16 +83,22 @@ export function LevelProgressSpinModal({
   energy: _energy,
   onSpendCoins,
   onRefundCoins,
+  onGrantEnergy,
+  onEnergyFlyStart,
 }) {
   const [level, setLevel] = useState(1);
   const [progress, setProgress] = useState(0);
   const [multiplier, setMultiplier] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [status, setStatus] = useState(
-    /** @type {"idle" | "spinning" | "result" | "level_complete"} */ ("idle")
+    /** @type {"idle" | "spinning" | "result" | "level_complete" | "collecting_reward"} */ ("idle")
   );
   const [lastResult, setLastResult] = useState(0);
   const [lastRefund, setLastRefund] = useState(0);
+  const [collectingReward, setCollectingReward] = useState(false);
+  const [energyFxRunId, setEnergyFxRunId] = useState(
+    /** @type {number | null} */ (null)
+  );
   const pendingSpinRef = useRef(
     /** @type {null | { result: number; cost: number }} */ (null)
   );
@@ -133,6 +159,16 @@ export function LevelProgressSpinModal({
   }, [stepValues]);
 
   const progressPct = Math.max(0, Math.min(100, (progress / maxSteps) * 100));
+  const confetti = useMemo(() => {
+    return Array.from({ length: 18 }, (_, i) => ({
+      id: i,
+      left: `${(i * 17 + 7) % 100}%`,
+      top: `${(i * 23) % 85}%`,
+      rot: (i * 47) % 360,
+      color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+      delay: (i % 6) * 0.08,
+    }));
+  }, []);
 
   const segmentPaths = useMemo(() => {
     const cx = 100;
@@ -207,6 +243,15 @@ export function LevelProgressSpinModal({
   useEffect(() => {
     return () => videoSegmentCleanupRef.current();
   }, []);
+
+  useEffect(() => {
+    if (status !== "level_complete") return;
+    const prev = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = prev;
+    };
+  }, [status]);
 
   const applySpinResult = useCallback(
     (result, cost) => {
@@ -283,7 +328,7 @@ export function LevelProgressSpinModal({
     });
   }
 
-  function handleNextLevel() {
+  const handleNextLevel = useCallback(() => {
     videoSegmentCleanupRef.current();
     const v = videoRef.current;
     if (v) {
@@ -295,7 +340,17 @@ export function LevelProgressSpinModal({
     setProgress(0);
     setLastResult(0);
     setLastRefund(0);
+    setCollectingReward(false);
+    setEnergyFxRunId(null);
     setStatus("idle");
+  }, []);
+
+  function handleCollectReward() {
+    if (collectingReward) return;
+    setCollectingReward(true);
+    setStatus("collecting_reward");
+    onGrantEnergy?.(LEVEL_COMPLETE_ENERGY_REWARD);
+    setEnergyFxRunId(Date.now());
   }
 
   const formatCoins = (n) => new Intl.NumberFormat("ru-RU").format(n);
@@ -409,13 +464,114 @@ export function LevelProgressSpinModal({
       ) : null}
 
       {status === "level_complete" ? (
-        <div className="level-spin__state level-spin__state--complete">
-          <strong>LEVEL COMPLETE</strong>
-          <span>Возврат: {formatCoins(lastRefund)}</span>
-          <button type="button" onClick={handleNextLevel}>
-            Дальше
-          </button>
+        <div
+          className="daily-bonus-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="level-complete-title"
+          onClick={handleCollectReward}
+        >
+          <div className="daily-bonus-modal__confetti" aria-hidden>
+            {confetti.map((c) => (
+              <span
+                key={c.id}
+                className="daily-bonus-modal__confetti-piece"
+                style={{
+                  left: c.left,
+                  top: c.top,
+                  "--rot": `${c.rot}deg`,
+                  "--delay": `${c.delay}s`,
+                  backgroundColor: c.color,
+                }}
+              />
+            ))}
+          </div>
+          <div className="daily-bonus-modal__card">
+            <div className="daily-bonus-modal__booster" aria-hidden>
+              <img
+                src={LEVEL_BOX_IMG}
+                alt=""
+                className="daily-bonus-modal__fire level-spin__complete-box"
+                width={96}
+                height={96}
+                draggable={false}
+              />
+              <div className="daily-bonus-modal__rays">
+                <img
+                  src={RAYS_1}
+                  alt=""
+                  className="daily-bonus-modal__ray daily-bonus-modal__ray--1"
+                  draggable={false}
+                />
+                <img
+                  src={RAYS_2}
+                  alt=""
+                  className="daily-bonus-modal__ray daily-bonus-modal__ray--2"
+                  draggable={false}
+                />
+              </div>
+            </div>
+
+            <div className="daily-bonus-modal__body">
+              <div className="daily-bonus-modal__body-content">
+                <p id="level-complete-title" className="daily-bonus-modal__headline">
+                  Уровень {level} пройден!
+                </p>
+                <img
+                  src={ENERGY_IMG}
+                  alt=""
+                  className="level-spin__complete-energy"
+                  width={72}
+                  height={72}
+                  draggable={false}
+                />
+                <p className="daily-bonus-modal__reward">
+                  <span className="daily-bonus-modal__reward-num">
+                    Твой гранд-приз
+                  </span>
+                  <span className="daily-bonus-modal__reward-rest">
+                    {" "}х{LEVEL_COMPLETE_ENERGY_REWARD}{" "}
+                    <img
+                      src={ENERGY_ICON_IMG}
+                      alt=""
+                      className="level-spin__inline-icon"
+                      width={18}
+                      height={18}
+                      draggable={false}
+                    />
+                  </span>
+                </p>
+                {lastRefund > 0 ? (
+                  <p className="level-spin__complete-refund">
+                    Возврат: {formatCoins(lastRefund)}
+                    <img
+                      src={COIN_ICON_IMG}
+                      alt=""
+                      className="level-spin__inline-icon"
+                      width={16}
+                      height={16}
+                      draggable={false}
+                    />
+                  </p>
+                ) : null}
+              </div>
+            </div>
+          </div>
+          <p className="daily-bonus-modal__hint">
+            {collectingReward ? "Collecting..." : "Tap to collect"}
+          </p>
         </div>
+      ) : null}
+      {energyFxRunId != null ? (
+        <CoinWinFlyover
+          amount={LEVEL_COMPLETE_ENERGY_REWARD}
+          runId={energyFxRunId}
+          iconSrc={ENERGY_ICON_IMG}
+          flyTarget="energy"
+          badgeTone="energy"
+          onCoinsFlyStart={onEnergyFlyStart}
+          onComplete={handleNextLevel}
+        />
       ) : null}
     </section>
   );

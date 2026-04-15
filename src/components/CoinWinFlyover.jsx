@@ -12,9 +12,20 @@ const PARTICLE_COUNT = 22;
  *   runId: number,
  *   onComplete: () => void,
  *   onCoinsFlyStart?: () => void,
+ *   iconSrc?: string,
+ *   flyTarget?: "coins" | "energy",
+ *   badgeTone?: "coins" | "energy",
  * }} props
  */
-export function CoinWinFlyover({ amount, runId, onComplete, onCoinsFlyStart }) {
+export function CoinWinFlyover({
+  amount,
+  runId,
+  onComplete,
+  onCoinsFlyStart,
+  iconSrc = COIN_IMG,
+  flyTarget = "coins",
+  badgeTone = "coins",
+}) {
   const [phase, setPhase] = useState(
     /** @type {'gather' | 'badge' | 'badgeExit' | 'coinsFly'} */ ("gather")
   );
@@ -61,7 +72,9 @@ export function CoinWinFlyover({ amount, runId, onComplete, onCoinsFlyStart }) {
   return (
     <div className="coin-win-fx" aria-hidden>
       <div
-        className={`coin-win-fx__cluster coin-win-fx__cluster--${phase}`}
+        className={`coin-win-fx__cluster coin-win-fx__cluster--${phase}${
+          phase === "coinsFly" ? ` coin-win-fx__cluster--coinsFly-${flyTarget}` : ""
+        }`}
       >
         {particles.map((p) => (
           <div
@@ -76,20 +89,22 @@ export function CoinWinFlyover({ amount, runId, onComplete, onCoinsFlyStart }) {
               "--ty": `${p.ty}px`,
               "--rot": `${p.rot}deg`,
               animationDelay: `${p.delay}s`,
-              backgroundImage: `url(${COIN_IMG})`,
+              backgroundImage: `url(${iconSrc})`,
             }}
           />
         ))}
 
         {(phase === "badge" || phase === "badgeExit") && (
           <div
-            className={`coin-win-fx__badge${phase === "badgeExit" ? " coin-win-fx__badge--exit" : ""}`}
+            className={`coin-win-fx__badge coin-win-fx__badge--${badgeTone}${
+              phase === "badgeExit" ? " coin-win-fx__badge--exit" : ""
+            }`}
           >
             <span className="coin-win-fx__badge-plus">+</span>
             <span className="coin-win-fx__badge-val">{formatted}</span>
             <img
               className="coin-win-fx__badge-coin"
-              src={COIN_IMG}
+              src={iconSrc}
               alt=""
               width={44}
               height={44}
