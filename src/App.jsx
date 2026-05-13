@@ -24,6 +24,7 @@ import {
   injectEnergyPaywallAfterVideo,
 } from "./constants/videos";
 import { publicUrl } from "./publicUrl";
+import { Bounce, ToastContainer } from "react-toastify";
 import {
   getInvitedFriendsCount,
   getTelegramUserProfile,
@@ -425,6 +426,21 @@ function AppShell() {
           </div>
         </div>
       </header>
+
+      <ToastContainer
+        className="app-shell__toast-root"
+        position="top-center"
+        autoClose={1000}
+        hideProgressBar
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition={Bounce}
+      />
 
       <BurgerDrawer
         open={drawerOpen}

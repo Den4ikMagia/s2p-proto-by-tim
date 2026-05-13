@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Bounce, toast } from "react-toastify";
 import {
   playSfxBase,
   preloadSfxBases,
@@ -258,6 +259,17 @@ export function LevelProgressSpinModal({
       const prevProgress = progressRef.current;
       setLastResult(result);
       if (result === 0) {
+        toast("    😐Oops...   ", {
+          position: "top-center",
+          autoClose: 1500,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Bounce,
+        });
         setStatus("result");
         return;
       }
@@ -295,7 +307,17 @@ export function LevelProgressSpinModal({
   function handleSpin() {
     if (status === "spinning") return;
     if (coins < spinCost) {
-      window.alert("Not enough coins");
+      toast.warn("Не достаточно монет!", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      });
       return;
     }
 

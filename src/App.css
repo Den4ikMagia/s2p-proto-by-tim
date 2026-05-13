@@ -23,6 +23,12 @@
   overflow: visible;
 }
 
+/* ToastContainer в корне App: поверх HUD и ниже полоски меню (не под z-index ленты/колеса) */
+.app-shell__toast-root.Toastify {
+  --toastify-z-index: 10050;
+  --toastify-toast-top: calc(8px + env(safe-area-inset-top, 0px) + 38px + 12px);
+}
+
 .app-shell__topbar {
   display: flex;
   align-items: center;
